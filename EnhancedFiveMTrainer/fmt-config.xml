@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fmt-config>
+  <keys>
+    <!--
+    A listing of available key values is available at http://www.garybeene.com/code/gbsnippets_gbs_00292.htm 
+    Most if not all of those are supported, at least in theory.
+    For now, if you want controller input, you need to map it to a key first using some utility.
+    If you cock up this file and enter an invalid key, the default will be used instead.
+    If you manage to assign the same key to multiple functions, who knows?
+    Modifiers like Ctrl and Alt (e.g. Ctrl-A) may come along later.
+    -->
+    <key function="toggle_trainer_menu" value="VK_F3"/>
+    <key function="menu_up" value="VK_UP"/>
+    <key function="menu_down" value="VK_DOWN"/>
+    <key function="menu_left" value="VK_LEFT"/>
+    <key function="menu_right" value="VK_RIGHT"/>
+    <key function="menu_select" value="VK_RETURN"/>
+    <key function="menu_back" value="VK_BACK"/>
+  </keys>
+</fmt-config>
