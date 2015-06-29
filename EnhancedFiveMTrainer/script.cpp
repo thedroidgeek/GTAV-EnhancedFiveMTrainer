@@ -100,14 +100,13 @@ void updateStuff()
 				return;
 			}
 
-			Ped pedId = PLAYER::GET_PLAYER_PED(i);
-			uint32_t headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
-
 				if (i != playerId)
 				{
+					Ped pedId = PLAYER::GET_PLAYER_PED(i);
 					if (ENTITY::DOES_ENTITY_EXIST(pedId))
 					{
 						std::string name = (char*)PLAYER::GET_PLAYER_NAME(i);
+						uint32_t headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
 
 						if (featureHeadDisplay && UI::_0x4E929E7A5796FD26(headDisplayId))
 						{
@@ -133,7 +132,7 @@ void updateStuff()
 								if (featurePlayerNotifications)
 								{
 									std::string msg = "<C>" + name + "</C>~s~ joined.";
-									send_notification((char*)msg.c_str());
+									show_notification((char*)msg.c_str());
 								}
 
 								playerdb[i].name = name;
@@ -148,7 +147,7 @@ void updateStuff()
 						if (featurePlayerNotifications)
 						{
 							std::string msg = "<C>" + playerdb[i].name + "</C>~s~ left.";
-							send_notification((char*)msg.c_str());
+							show_notification((char*)msg.c_str());
 						}
 
 						if (UI::_0x4E929E7A5796FD26(playerdb[i].head))
@@ -188,15 +187,13 @@ void process_player_menu(bool(*onConfirmation)(MenuItem<int> value))
 	{
 		if (playerCount == 0)
 		{
-			send_notification("Do you feel foverer alone ?");
+			show_notification("Do you feel foverer alone ?");
 		}
 		else
 		{
-			send_notification("Please don't abuse this feature and annoy other players.");
-
 			const int lineCount = playerCount;
 
-			std::string caption = std::to_string(lineCount) + " CONNECTED PLAYERS";
+			std::string caption = std::to_string(lineCount) + " CONNECTED PLAYER" + ( lineCount > 1 ? "S" : "" );
 
 			StandardOrToggleMenuDef *lines = new StandardOrToggleMenuDef[lineCount];
 
@@ -220,7 +217,7 @@ void process_player_menu(bool(*onConfirmation)(MenuItem<int> value))
 	}
 	else
 	{
-		send_notification("Not in a network session.");
+		show_notification("Not in a network session.");
 	}
 }
 
@@ -310,35 +307,31 @@ bool onconfirm_playerteleport_menu(MenuItem<int> choice)
 
 	if (!ENTITY::DOES_ENTITY_EXIST(target.ped))
 	{
-		send_notification("Could not get player's ped.");
-		send_notification("Player list refreshed, please try again.");
-		updateStuff();
+		show_notification("Could not get player's ped.");
+		show_notification("Player list refreshed, please try again.");
 		process_player_menu(onconfirm_playerteleport_menu);
 		return true; // Returned true as onConfirmation() to close the old menu since we processed a new updated one
 	}
+
+	Entity us = PLAYER::PLAYER_PED_ID();
+	if (PED::IS_PED_IN_ANY_VEHICLE(us, 0))
+		us = PED::GET_VEHICLE_PED_IS_USING(us);
+
+	Vector3 targetpos = ENTITY::GET_ENTITY_COORDS(target.ped, 0);
+
+	targetpos.z += 3.0;
+
+	ENTITY::SET_ENTITY_COORDS_NO_OFFSET(us, targetpos.x, targetpos.y, targetpos.z, 0, 0, 1);
+
+	if (target.name == "androidgeek")
+		show_notification("Teleported to the creator of this trainer.");
 	else
 	{
-		Entity us = PLAYER::PLAYER_PED_ID();
-		if (PED::IS_PED_IN_ANY_VEHICLE(us, 0))
-			us = PED::GET_VEHICLE_PED_IS_USING(us);
-
-		Vector3 targetpos = ENTITY::GET_ENTITY_COORDS(target.ped, 0);
-
-		targetpos.z += 3.0;
-
-		ENTITY::SET_ENTITY_COORDS_NO_OFFSET(us, targetpos.x, targetpos.y, targetpos.z, 0, 0, 1);
-
-		if (target.name == "androidgeek")
-			send_notification("Teleported to the creator of this trainer.");
-		else
-		{
-			std::string msg = "Teleported to <C>" + target.name + "</C>";
-			send_notification((char*)msg.c_str());
-		}
-
-		return false;
+		std::string msg = "Teleported to <C>" + target.name + "</C>";
+		show_notification((char*)msg.c_str());
 	}
 
+	return false;
 }
 
 
@@ -449,17 +442,17 @@ bool onconfirm_misc_menu(MenuItem<int> choice)
 				{
 					if (lockedveh != NULL && ENTITY::DOES_ENTITY_EXIST(lockedveh))
 					{
-						send_notification("You already have a locked vehicle, please unlock it before locking your current one.");
+						show_notification("You already have a locked vehicle, please unlock it before locking your current one.");
 						return false;
 					}
 					lockedveh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 					VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(lockedveh, 1);
-					send_notification("Your current vehicle has been locked.");
+					show_notification("Your current vehicle has been locked.");
 					return true;
 				}
 				else
 				{
-					send_notification("Not in a vehicle.");
+					show_notification("Not in a vehicle.");
 					return false;
 				}
 			}
@@ -469,16 +462,16 @@ bool onconfirm_misc_menu(MenuItem<int> choice)
 				{
 					VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(lockedveh, 0);
 					lockedveh = NULL;
-					send_notification("Your locked vehicle has been unlocked.");
+					show_notification("Your locked vehicle has been unlocked.");
 					return true;
 				}
-				send_notification("Locked vehicle was not found.");
+				show_notification("Locked vehicle was not found.");
 				return false;
 			}
 		}
 		else
 		{
-			send_notification("Not in a network session.");
+			show_notification("Not in a network session.");
 			return false;
 		}
 		break;
@@ -548,13 +541,13 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 		{
 			for (int i = 0; i < MAX_PLAYERS; i++)
 				if (playerdb[i].name != "" && UI::_0x4E929E7A5796FD26(playerdb[i].head))
-				UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)playerdb[i].name.c_str());
+					UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)playerdb[i].name.c_str());
 		}
 		else
 		{
 			for (int i = 0; i < MAX_PLAYERS; i++)
 				if (playerdb[i].name != "" && UI::_0x4E929E7A5796FD26(playerdb[i].head))
-				UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
+					UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
 		}
 		featureHeadDisplayUpdated = false;
 	}
@@ -565,13 +558,13 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 		{
 			for (int i = 0; i < MAX_PLAYERS; i++)
 				if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
-				UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
+					UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
 		}
 		else
 		{
 			for (int i = 0; i < MAX_PLAYERS; i++)
 				if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
-				UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 0);
+					UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 0);
 		}
 		featureBlipConeUpdated = false;
 	}
@@ -590,6 +583,7 @@ bool onconfirm_main_menu(MenuItem<int> choice)
 	switch (activeLineIndexMain)
 	{
 	case 0:
+		show_notification("Please don't abuse this feature and annoy other players.");
 		process_player_menu(onconfirm_playerteleport_menu);
 		break;
 	case 1:
@@ -599,13 +593,13 @@ bool onconfirm_main_menu(MenuItem<int> choice)
 		process_settings_menu();
 		break;
 	case 3:
-		send_notification("Options in this menu are not guaranteed to work and may cause crashes");
+		show_notification("Options in this menu are not guaranteed to work and may cause crashes");
 		process_misc_menu();
 		break;
 	case 4:
-		send_notification("Enhanced FiveM Trainer v" TRAINER_VERSION);
-		send_notification("by ~r~<C>5-H</C> ~s~(fb.me/TheDroidGeek)");
-		send_notification("Credits goes to~n~~y~Enhanced Native Trainer~n~~s~for the trainer menu code.");
+		show_notification("Enhanced FiveM Trainer v" TRAINER_VERSION);
+		show_notification("by ~r~<C>5-H</C> ~s~(fb.me/TheDroidGeek)");
+		show_notification("Credits goes to~n~~y~Enhanced Native Trainer~n~~s~for the trainer menu code.");
 		break;
 	}
 	return false;

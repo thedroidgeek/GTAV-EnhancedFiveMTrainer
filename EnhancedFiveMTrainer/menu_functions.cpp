@@ -160,7 +160,7 @@ void menu_beep(int option)
 	}
 }
 
-void send_notification(char* msg) {
+void show_notification(char* msg) {
 	UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
 	UI::_ADD_TEXT_COMPONENT_STRING(msg);
 	UI::_DRAW_NOTIFICATION(FALSE, FALSE);

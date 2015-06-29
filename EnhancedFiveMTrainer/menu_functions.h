@@ -688,7 +688,7 @@ void menu_beep(int option);
 
 void update_status_text();
 
-void send_notification(char* msg);
+void show_notification(char* msg);
 
 void draw_menu_from_struct_def(StandardOrToggleMenuDef defs[], int lineCount, int* selectionRef, std::string caption, bool(*onConfirmation)(MenuItem<int> value));
 
