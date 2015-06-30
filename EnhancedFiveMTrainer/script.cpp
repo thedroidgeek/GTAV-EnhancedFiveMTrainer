@@ -445,10 +445,17 @@ bool onconfirm_misc_menu(MenuItem<int> choice)
 						show_notification("You already have a locked vehicle, please unlock it before locking your current one.");
 						return false;
 					}
+
 					lockedveh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
-					VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(lockedveh, 1);
-					show_notification("Your current vehicle has been locked.");
-					return true;
+					if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(lockedveh, -1) == playerPed)
+					{
+						VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(lockedveh, 1);
+						show_notification("Your current vehicle has been locked.");
+						return true;
+					}
+					lockedveh = NULL;
+					show_notification("You can't lock a vehicle you're not driving.");
+					return false;
 				}
 				else
 				{
