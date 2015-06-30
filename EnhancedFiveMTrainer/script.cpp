@@ -90,8 +90,8 @@ void updateStuff()
 		if (playerWasDisconnected) {
 			NETWORK::NETWORK_SET_FRIENDLY_FIRE_OPTION(1);
 			playerId = PLAYER::PLAYER_ID();
+			PED::SET_CAN_ATTACK_FRIENDLY(playerId, 1, 1);
 		}
-		PED::SET_CAN_ATTACK_FRIENDLY(PLAYER::PLAYER_PED_ID(), 1, 1);
 
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -135,10 +135,10 @@ void updateStuff()
 									show_notification((char*)msg.c_str());
 								}
 
+								PED::SET_CAN_ATTACK_FRIENDLY(i, 1, 1);
 								playerdb[i].name = name;
 								playerCount++;
 							}
-							PED::SET_CAN_ATTACK_FRIENDLY(pedId, 1, 1);
 							playerdb[i].ped = pedId;
 						}
 					}
