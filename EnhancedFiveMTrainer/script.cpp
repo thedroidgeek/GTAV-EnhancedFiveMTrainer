@@ -53,7 +53,8 @@ std::vector<int> playerIdForMenuEntries;
 
 int playerCount = 0;
 
-Vehicle lockedveh;
+Vehicle ownedveh;
+bool ownedvehlocked = false;
 
 
 bool playerWasDisconnected = true; // To skip conditions for first iteration of creation of blips and stuff
@@ -77,6 +78,8 @@ bool onconfirm_animation_menu(MenuItem<int> choice);
 bool onconfirm_misc_menu(MenuItem<int> choice);
 
 bool onconfirm_settings_menu(MenuItem<int> choice);
+
+bool onconfirm_vehicle_menu(MenuItem<int> choice);
 
 
 //=============================
@@ -266,14 +269,35 @@ void process_misc_menu()
 {
 	std::string caption = "MISCELLANEOUS";
 
-	const int lineCount = 2;
+	const int lineCount = 1;
 
 	StandardOrToggleMenuDef lines[lineCount] = {
-		{ "Lock Vehicle For All Players", NULL, NULL, true },
-		{ "Unlock Your Locked Vehicle", NULL, NULL, true }
+		{ "Basic Vehicle Management System", NULL, NULL, false }
 	};
 
 	draw_menu_from_struct_def(lines, lineCount, &activeLineIndexMisc, caption, onconfirm_misc_menu);
+}
+
+
+int activeLineIndexVeh = 0;
+
+void process_vehicle_menu()
+{
+	std::string caption = "VEHICLE MANAGEMENT";
+
+	const int lineCount = 7;
+
+	StandardOrToggleMenuDef lines[lineCount] = {
+		{ "Set Current Vehicle As Owned", NULL, NULL, true },
+		{ "Clear Owned Vehicle", NULL, NULL, true },
+		{ "Lock Owned Vehicle", NULL, NULL, true },
+		{ "Unlock Owned Vehicle", NULL, NULL, true },
+		{ "Kick Owned Vehicle's Current Driver", NULL, NULL, true },
+		{ "Retreive Owned Vehicle", NULL, NULL, true },
+		{ "Explode Owned Vehicle", NULL, NULL, true }
+	};
+
+	draw_menu_from_struct_def(lines, lineCount, &activeLineIndexVeh, caption, onconfirm_vehicle_menu);
 }
 
 
@@ -428,58 +452,184 @@ bool onconfirm_animation_menu(MenuItem<int> choice)
 
 bool onconfirm_misc_menu(MenuItem<int> choice)
 {
-	switch(activeLineIndexMisc)
+	switch (activeLineIndexMisc)
 	{
 	case 0:
-	case 1:
-		if (NETWORK::NETWORK_IS_SESSION_STARTED())
-		{
-			Ped playerPed = PLAYER::PLAYER_PED_ID();
-			if (activeLineIndexMisc == 0)
-			{
-				if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, 1))
-				{
-					if (lockedveh != NULL && ENTITY::DOES_ENTITY_EXIST(lockedveh))
-					{
-						show_notification("You already have a locked vehicle, please unlock it before locking your current one.");
-						return false;
-					}
+		process_vehicle_menu();
+		break;
+	}
+	return false;
+}
 
-					lockedveh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
-					if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(lockedveh, -1) == playerPed)
-					{
-						VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(lockedveh, 1);
-						show_notification("Your current vehicle has been locked.");
-						return true;
-					}
-					lockedveh = NULL;
-					show_notification("You can't lock a vehicle you're not driving.");
-					return false;
-				}
-				else
-				{
-					show_notification("Not in a vehicle.");
-					return false;
-				}
+
+bool onconfirm_vehicle_menu(MenuItem<int> choice)
+{
+	Ped playerPed = PLAYER::PLAYER_PED_ID();
+	switch (activeLineIndexVeh)
+	{
+	case 0:
+		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh)) {
+			show_notification("You already have an owned vehicle, please clear it first.");
+		}
+		else if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, 1))
+		{
+			ownedveh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+			if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(ownedveh, -1) == playerPed) {
+				ENTITY::SET_ENTITY_AS_MISSION_ENTITY(ownedveh, 1, 1);
+				AUDIO::SET_VEHICLE_RADIO_LOUD(ownedveh, 1);
+				ownedvehlocked = false;
+				show_notification("Your current vehicle has been set as owned.");
 			}
-			else
-			{
-				if (ENTITY::DOES_ENTITY_EXIST(lockedveh))
-				{
-					VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(lockedveh, 0);
-					lockedveh = NULL;
-					show_notification("Your locked vehicle has been unlocked.");
-					return true;
-				}
-				show_notification("Locked vehicle was not found.");
-				return false;
+			else {
+				ownedveh = NULL;
+				ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&ownedveh);
+				show_notification("You can't own a vehicle you're not driving.");
 			}
 		}
 		else
+			show_notification("Not in a vehicle.");
+		break;
+	case 1:
+		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh))
 		{
-			show_notification("Not in a network session.");
-			return false;
+			VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(ownedveh, 0);
+			VEHICLE::SET_VEHICLE_ALARM(ownedveh, 0);
+			ownedveh = NULL;
+			show_notification("Cleared previously owned vehicle.");
 		}
+		else
+			show_notification("Owned vehicle not found.");
+		break;
+	case 2:
+		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh))
+		{
+			if (!ownedvehlocked)
+			{
+				VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(ownedveh, 1);
+				VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_PLAYER(ownedveh, playerId, 0);
+				VEHICLE::SET_VEHICLE_ALARM(ownedveh, 1);
+				ownedvehlocked = true;
+				if (VEHICLE::IS_VEHICLE_SEAT_FREE(ownedveh, -1)) {
+					if (VEHICLE::IS_VEHICLE_A_CONVERTIBLE(ownedveh, 0)) {
+						int rstate = VEHICLE::GET_CONVERTIBLE_ROOF_STATE(ownedveh);
+						if (rstate != 0 && rstate != 3)
+							VEHICLE::RAISE_CONVERTIBLE_ROOF(ownedveh, 0);
+					}
+					show_notification("Owned vehicle locked for other players.");
+
+					VEHICLE::START_VEHICLE_ALARM(ownedveh);
+					WAIT(2000);
+					VEHICLE::SET_VEHICLE_ALARM(ownedveh, 0);
+					VEHICLE::SET_VEHICLE_ALARM(ownedveh, 1);
+				}
+				else
+					show_notification("Owned vehicle will be locked as soon as the driver gets out.");
+			}
+			else
+				show_notification("Owned vehicle already locked.");
+		}
+		else
+			show_notification("Owned vehicle not found.");
+		break;
+	case 3:
+		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh))
+		{
+			if (ownedvehlocked) {
+				VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(ownedveh, 0);
+				show_notification("Owned vehicle unlocked.");
+				if (VEHICLE::IS_VEHICLE_SEAT_FREE(ownedveh, -1)) {
+					VEHICLE::SET_VEHICLE_ALARM(ownedveh, 1);
+					VEHICLE::START_VEHICLE_ALARM(ownedveh);
+					WAIT(1000);
+				}
+				VEHICLE::SET_VEHICLE_ALARM(ownedveh, 0);
+				ownedvehlocked = false;
+			}
+			else
+				show_notification("Owned vehicle already unlocked.");
+		}
+		else
+			show_notification("Owned vehicle not found.");
+		break;
+	case 4:
+		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh))
+		{
+			Ped driver = VEHICLE::GET_PED_IN_VEHICLE_SEAT(ownedveh, -1);
+			if (ENTITY::DOES_ENTITY_EXIST(driver)) {
+				if (driver == playerPed)
+					show_notification("Really now?");
+				else {
+					AI::CLEAR_PED_TASKS_IMMEDIATELY(driver);
+					show_notification("Your vehicle's driver was kicked.");
+				}
+			}
+			else
+				show_notification("No driver was found.");
+		}
+		else
+			show_notification("Owned vehicle not found.");
+		break;
+	case 5:
+		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh)) {
+			Ped driver = VEHICLE::GET_PED_IN_VEHICLE_SEAT(ownedveh, -1);
+			if (ENTITY::DOES_ENTITY_EXIST(driver)) {
+				if (driver == playerPed) {
+					show_notification("You are already driving your damn vehicle.");
+					return false;
+				}
+				AI::CLEAR_PED_TASKS_IMMEDIATELY(driver);
+			}
+			Vector3 mypos = ENTITY::GET_ENTITY_COORDS(playerPed, 0);
+			AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPed);
+			int tick = 0;
+			while (tick < 500 && !PED::IS_PED_IN_ANY_VEHICLE(playerPed, 0)) {
+				AI::TASK_WARP_PED_INTO_VEHICLE(playerPed, ownedveh, -1);
+				WAIT(0);
+				tick++;
+			}
+			if (tick == 500)
+				show_notification("DEBUG: Failed to warp to vehicle.");
+			NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(ownedveh);
+			tick = 0;
+			while (tick < 500 && !NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(ownedveh)) {
+				WAIT(0);
+				tick++;
+			}
+			if (tick == 500)
+				show_notification("DEBUG: Failed to obtain control of entity.");
+			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ownedveh, mypos.x, mypos.y, mypos.z, 0, 0, 1);
+			VEHICLE::SET_VEHICLE_FIXED(ownedveh);
+			show_notification("Your vehicle was retreived and fixed, you're welcome.");
+		}
+		else
+			show_notification("Owned vehicle not found.");
+		break;
+	case 6:
+		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh))
+		{
+			Ped driver = VEHICLE::GET_PED_IN_VEHICLE_SEAT(ownedveh, -1);
+			if (ENTITY::DOES_ENTITY_EXIST(driver)) {
+				if (driver == playerPed) {
+					show_notification("You are driving the damn vehicle.");
+					return false;
+				}
+				AI::CLEAR_PED_TASKS_IMMEDIATELY(driver);
+			}
+			NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(ownedveh);
+			int tick = 0;
+			while (tick < 500 && !NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(ownedveh)) {
+				WAIT(0);
+				tick++;
+			}
+			if (tick == 500)
+				show_notification("DEBUG: Failed to obtain control of entity.");
+			ENTITY::SET_ENTITY_INVINCIBLE(ownedveh, 0);
+			NETWORK::NETWORK_EXPLODE_VEHICLE(ownedveh, 1, 0, 0);
+			ownedveh = NULL;
+			show_notification("Exploded previously owned vehicle.");
+		}
+		else
+			show_notification("Owned vehicle not found.");
 		break;
 	}
 	return false;
