@@ -142,7 +142,7 @@ void updateStuff()
 							playerdb[i].ped = pedId;
 						}
 					}
-					else if (playerdb[i].name != "" && !ENTITY::DOES_ENTITY_EXIST(PLAYER::GET_PLAYER_PED(i)))
+					else if (playerdb[i].name != "")
 					{
 						if (featurePlayerNotifications)
 						{
