@@ -266,12 +266,11 @@ void process_misc_menu()
 {
 	std::string caption = "MISCELLANEOUS";
 
-	const int lineCount = 3;
+	const int lineCount = 2;
 
 	StandardOrToggleMenuDef lines[lineCount] = {
 		{ "Lock Vehicle For All Players", NULL, NULL, true },
-		{ "Unlock Your Locked Vehicle", NULL, NULL, true },
-		{ "Unleash The Fireworks", NULL, NULL, true }
+		{ "Unlock Your Locked Vehicle", NULL, NULL, true }
 	};
 
 	draw_menu_from_struct_def(lines, lineCount, &activeLineIndexMisc, caption, onconfirm_misc_menu);
@@ -480,31 +479,6 @@ bool onconfirm_misc_menu(MenuItem<int> choice)
 		{
 			show_notification("Not in a network session.");
 			return false;
-		}
-		break;
-
-	case 2:
-		Ped playerPed = PLAYER::PLAYER_PED_ID();
-		if (PLAYER::IS_PLAYER_CONTROL_ON(PLAYER::PLAYER_ID())) {
-			Entity e;
-			if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, 0))
-				e = PED::GET_VEHICLE_PED_IS_USING(playerPed);
-			else
-				e = playerPed;
-			Vector3 v0, v1;
-			GAMEPLAY::GET_MODEL_DIMENSIONS(ENTITY::GET_ENTITY_MODEL(e), &v0, &v1);
-			Hash weaponAssetRocket = GAMEPLAY::GET_HASH_KEY("WEAPON_FIREWORK");
-			if (!WEAPON::HAS_WEAPON_ASSET_LOADED(weaponAssetRocket)) {
-				WEAPON::REQUEST_WEAPON_ASSET(weaponAssetRocket, 31, 0);
-				while (!WEAPON::HAS_WEAPON_ASSET_LOADED(weaponAssetRocket))
-					WAIT(0);
-			}
-			Vector3 coords0from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(e, -(v1.x + 0.25f), v1.y + 1.25f, 0.1);
-			Vector3 coords1from = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(e, (v1.x + 0.25f), v1.y + 1.25f, 0.1);
-			Vector3 coords0to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(e, -v1.x, v1.y + 100.0f, 100.0f);
-			Vector3 coords1to = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(e, v1.x, v1.y + 100.0f, 100.0f);
-			GAMEPLAY::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords0from.x, coords0from.y, coords0from.z, coords0to.x, coords0to.y, coords0to.z, 250, 1, weaponAssetRocket, playerPed, 1, 0, -1.0);
-			GAMEPLAY::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords1from.x, coords1from.y, coords1from.z, coords1to.x, coords1to.y, coords1to.z, 250, 1, weaponAssetRocket, playerPed, 1, 0, -1.0);
 		}
 		break;
 	}
