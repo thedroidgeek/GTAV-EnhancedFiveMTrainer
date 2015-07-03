@@ -767,15 +767,6 @@ void main()
 {	
 	set_periodic_feature_call(updateStuff);
 
-	// this creates a new locale based on the current application default
-	// (which is either the one given on startup, but can be overriden with
-	// std::locale::global) - then extends it with an extra facet that 
-	// controls numeric output.
-	std::locale comma_locale(std::locale(), new comma_numpunct());
-
-	// tell cout to use our new locale.
-	std::cout.imbue(comma_locale);
-
 	while (true)
 	{
 		if (is_menu_showing())
