@@ -15,7 +15,7 @@ https://github.com/gtav-ent/GTAV-EnhancedNativeTrainer
 #include "keyboard.h"
 
 /**A class to hold the current key bindings.*/
-class KeyInputConfig
+class SettingsConfig
 {
 public:
 	//these are the defaults which may be overridden by the XML config
@@ -29,8 +29,13 @@ public:
 	int key_menu_confirm = VK_NUMPAD5;
 	int key_menu_back = VK_NUMPAD0;
 
-	/**Change the key binding using a function string and key string.*/
-	void set_key(char* function, char* keyName);
+	bool setting_player_blips = 1;
+	bool setting_player_head_display = 1;
+	bool setting_player_blip_cone = 0;
+	bool setting_player_notifications = 1;
+
+	/**Change the key binding and settings using a function string and key string.*/
+	void set_param(char* function, char* value);
 };
 
 /**A class to hold all the user settings.*/
@@ -38,10 +43,10 @@ class TrainerConfig
 {
 public:
 	TrainerConfig();
-	KeyInputConfig* get_key_config() { return keyConfig;  }
+	SettingsConfig* get_trainer_config() { return settingsConfig; }
 
 private:
-	KeyInputConfig* keyConfig;
+	SettingsConfig* settingsConfig;
 };
 
 /**The current user config.*/
@@ -52,4 +57,3 @@ void read_config_file();
 
 /**Get the current config object.*/
 inline TrainerConfig* get_config() { return config;  }
-

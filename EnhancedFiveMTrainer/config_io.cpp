@@ -16,7 +16,7 @@ BSTR bstr;
 
 TrainerConfig *config = NULL;
 
-/**Read the XML config file. Currently contains keyboard choices.*/
+/**Read the XML config file. Currently contains keyboard choices and trainer settings.*/
 void read_config_file()
 {
 	TrainerConfig *result = new TrainerConfig();
@@ -31,7 +31,7 @@ void read_config_file()
 		config = result; //the default config
 	}
 
-	IXMLDOMNodeListPtr nodes = spXMLDoc->selectNodes(L"//fmt-config/keys/key");
+	IXMLDOMNodeListPtr nodes = spXMLDoc->selectNodes(L"//fmt-config/*/*");
 
 	long length;
 	nodes->get_length(&length);
@@ -45,8 +45,8 @@ void read_config_file()
 		long length_attribs;
 		attribs->get_length(&length_attribs);
 
-		char *attrib_key_func = NULL;
-		char *attrib_key_value = NULL;
+		char *attrib_func = NULL;
+		char *attrib_value = NULL;
 
 		for (long j = 0; j < length_attribs; j++)
 		{
@@ -58,26 +58,26 @@ void read_config_file()
 				VARIANT var;
 				VariantInit(&var);
 				attribNode->get_nodeValue(&var);
-				attrib_key_func = _com_util::ConvertBSTRToString(V_BSTR(&var));
+				attrib_func = _com_util::ConvertBSTRToString(V_BSTR(&var));
 			}
 			else if (wcscmp(bstr, L"value") == 0)
 			{
 				VARIANT var;
 				VariantInit(&var);
 				attribNode->get_nodeValue(&var);
-				attrib_key_value = _com_util::ConvertBSTRToString(V_BSTR(&var));
+				attrib_value = _com_util::ConvertBSTRToString(V_BSTR(&var));
 			}
 			SysFreeString(bstr);
 			attribNode->Release();
 		}
 		
-		if (attrib_key_func != NULL && attrib_key_value != NULL)
+		if (attrib_func != NULL && attrib_value != NULL)
 		{
-			result->get_key_config()->set_key(attrib_key_func, attrib_key_value);
+			result->get_trainer_config()->set_param(attrib_func, attrib_value);
 		}
 		
-		delete attrib_key_func;
-		delete attrib_key_value;
+		delete attrib_func;
+		delete attrib_value;
 
 		attribs->Release();
 		node->Release();
@@ -90,45 +90,71 @@ void read_config_file()
 	config = result;
 }
 
-void KeyInputConfig::set_key(char* function, char* keyName)
+void SettingsConfig::set_param(char* function, char* value)
 {
-	int vkID = keyNameToVal(keyName);
-	if (vkID == -1)
+	if (strcmp(value, "0") != 0 && strcmp(value, "1") != 0)
 	{
-		return;
-	}
+		int vkID = keyNameToVal(value);
+		if (vkID == -1)
+		{
+			return;
+		}
 
-	if (strcmp(function, "menu_up") == 0)
-	{
-		key_menu_up = vkID;
+		if (strcmp(function, "menu_up") == 0)
+		{
+			key_menu_up = vkID;
+		}
+		else if (strcmp(function, "menu_down") == 0)
+		{
+			key_menu_down = vkID;
+		}
+		else if (strcmp(function, "menu_left") == 0)
+		{
+			key_menu_left = vkID;
+		}
+		else if (strcmp(function, "menu_right") == 0)
+		{
+			key_menu_right = vkID;
+		}
+		else if (strcmp(function, "menu_select") == 0)
+		{
+			key_menu_confirm = vkID;
+		}
+		else if (strcmp(function, "menu_back") == 0)
+		{
+			key_menu_back = vkID;
+		}
+		else if (strcmp(function, "toggle_trainer_menu") == 0)
+		{
+			toggle_trainer_menu = vkID;
+		}
 	}
-	else if (strcmp(function, "menu_down") == 0)
+	else
 	{
-		key_menu_down = vkID;
-	}
-	else if (strcmp(function, "menu_left") == 0)
-	{
-		key_menu_left = vkID;
-	}
-	else if (strcmp(function, "menu_right") == 0)
-	{
-		key_menu_right = vkID;
-	}
-	else if (strcmp(function, "menu_select") == 0)
-	{
-		key_menu_confirm = vkID;
-	}
-	else if (strcmp(function,"menu_back") == 0)
-	{
-		key_menu_back = vkID;
-	}
-	else if (strcmp(function, "toggle_trainer_menu") == 0)
-	{
-		toggle_trainer_menu = vkID;
+		bool result = 0;
+		if (strcmp(value, "1") == 0)
+			result = 1;
+
+		if (strcmp(function, "player_blips") == 0)
+		{
+			setting_player_blips = result;
+		}
+		else if (strcmp(function, "player_head_display") == 0)
+		{
+			setting_player_head_display = result;
+		}
+		else if (strcmp(function, "player_blip_cone") == 0)
+		{
+			setting_player_blip_cone = result;
+		}
+		else if (strcmp(function, "player_notifications") == 0)
+		{
+			setting_player_notifications = result;
+		}
 	}
 };
 
 TrainerConfig::TrainerConfig()
 {
-	this->keyConfig = new KeyInputConfig();
+	this->settingsConfig = new SettingsConfig();
 }

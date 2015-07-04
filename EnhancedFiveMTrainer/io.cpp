@@ -17,19 +17,19 @@ DWORD trainerResetTime = 0;
 
 bool trainer_switch_pressed()
 {
-	return IsKeyJustUp( config->get_key_config()->toggle_trainer_menu );
+	return IsKeyJustUp( config->get_trainer_config()->toggle_trainer_menu );
 }
 
 void get_button_state(bool *a, bool *b, bool *up, bool *down, bool *l, bool *r)
 {
-	KeyInputConfig *keyConf = config->get_key_config();
+	SettingsConfig *setConf = config->get_trainer_config();
 
-	if (a) *a = IsKeyDown(keyConf->key_menu_confirm);
-	if (b) *b = IsKeyDown(keyConf->key_menu_back);
-	if (up) *up = IsKeyDown(keyConf->key_menu_up);
-	if (down) *down = IsKeyDown(keyConf->key_menu_down);
-	if (r) *r = IsKeyDown(keyConf->key_menu_right);
-	if (l) *l = IsKeyDown(keyConf->key_menu_left);
+	if (a) *a = IsKeyDown(setConf->key_menu_confirm);
+	if (b) *b = IsKeyDown(setConf->key_menu_back);
+	if (up) *up = IsKeyDown(setConf->key_menu_up);
+	if (down) *down = IsKeyDown(setConf->key_menu_down);
+	if (r) *r = IsKeyDown(setConf->key_menu_right);
+	if (l) *l = IsKeyDown(setConf->key_menu_left);
 }
 
 bool get_key_pressed(int nVirtKey)

@@ -59,16 +59,10 @@ bool ownedvehlocked = false;
 
 bool playerWasDisconnected = true; // To skip conditions for first iteration of creation of blips and stuff
 
-bool featurePlayerBlips = true;
+bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerBlipCone, featurePlayerNotifications;
 bool featurePlayerBlipsUpdated = false;
-
-bool featureHeadDisplay = true;
-bool featureHeadDisplayUpdated = false;
-
-bool featureBlipCone = false;
-bool featureBlipConeUpdated = false;
-
-bool featurePlayerNotifications = true;
+bool featurePlayerHeadDisplayUpdated = false;
+bool featurePlayerBlipConeUpdated = false;
 
 
 bool onconfirm_playerteleport_menu(MenuItem<int> choice);
@@ -111,7 +105,7 @@ void updateStuff()
 						std::string name = (char*)PLAYER::GET_PLAYER_NAME(i);
 						uint32_t headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
 
-						if (featureHeadDisplay && UI::_0x4E929E7A5796FD26(headDisplayId))
+						if (featurePlayerHeadDisplay && UI::_0x4E929E7A5796FD26(headDisplayId))
 						{
 							UI::_0xDEA2B8283BAA3944(headDisplayId, (Any*)name.c_str()); // SET_HEAD_DISPLAY_STRING
 							UI::_0x63BB75ABEDC1F6A0(headDisplayId, 0, 1); // SET_HEAD_DISPLAY_FLAG
@@ -125,7 +119,7 @@ void updateStuff()
 								playerdb[i].blip = UI::ADD_BLIP_FOR_ENTITY(pedId);
 								UI::SET_BLIP_COLOUR(playerdb[i].blip, 0);
 								UI::SET_BLIP_SCALE(playerdb[i].blip, 0.8);
-								if (featureBlipCone)
+								if (featurePlayerBlipCone)
 									UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
 								UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
 							}
@@ -311,8 +305,8 @@ void process_settings_menu()
 
 	StandardOrToggleMenuDef lines[lineCount] = {
 		{ "Player Blips", &featurePlayerBlips, &featurePlayerBlipsUpdated, true },
-		{ "Player Head Display", &featureHeadDisplay, &featureHeadDisplayUpdated, true },
-		{ "Player Blip Cone (Police FOV)", &featureBlipCone, &featureBlipConeUpdated, true },
+		{ "Player Head Display", &featurePlayerHeadDisplay, &featurePlayerHeadDisplayUpdated, true },
+		{ "Player Blip Cone (Police FOV)", &featurePlayerBlipCone, &featurePlayerBlipConeUpdated, true },
 		{ "Player Notifications", &featurePlayerNotifications, NULL, true }
 	};
 
@@ -649,7 +643,7 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 					playerdb[i].blip = UI::ADD_BLIP_FOR_ENTITY((playerdb[i].ped));
 					UI::SET_BLIP_COLOUR(playerdb[i].blip, 0);
 					UI::SET_BLIP_SCALE(playerdb[i].blip, 0.8);
-					if (featureBlipCone)
+					if (featurePlayerBlipCone)
 						UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
 					UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
 				}
@@ -666,9 +660,9 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 		featurePlayerBlipsUpdated = false;
 	}
 
-	if (featureHeadDisplayUpdated)
+	if (featurePlayerHeadDisplayUpdated)
 	{
-		if (featureHeadDisplay)
+		if (featurePlayerHeadDisplay)
 		{
 			for (int i = 0; i < MAX_PLAYERS; i++)
 				if (playerdb[i].name != "" && UI::_0x4E929E7A5796FD26(playerdb[i].head))
@@ -680,12 +674,12 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 				if (playerdb[i].name != "" && UI::_0x4E929E7A5796FD26(playerdb[i].head))
 					UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
 		}
-		featureHeadDisplayUpdated = false;
+		featurePlayerHeadDisplayUpdated = false;
 	}
 
-	if (featureBlipConeUpdated)
+	if (featurePlayerBlipConeUpdated)
 	{
-		if (featureBlipCone)
+		if (featurePlayerBlipCone)
 		{
 			for (int i = 0; i < MAX_PLAYERS; i++)
 				if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
@@ -697,7 +691,7 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 				if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
 					UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 0);
 		}
-		featureBlipConeUpdated = false;
+		featurePlayerBlipConeUpdated = false;
 	}
 	return false;
 }
@@ -766,6 +760,11 @@ void process_main_menu()
 void main()
 {	
 	set_periodic_feature_call(updateStuff);
+
+	featurePlayerBlips = config->get_trainer_config()->setting_player_blips;
+	featurePlayerHeadDisplay = config->get_trainer_config()->setting_player_head_display;
+	featurePlayerBlipCone = config->get_trainer_config()->setting_player_blip_cone;
+	featurePlayerNotifications = config->get_trainer_config()->setting_player_notifications;
 
 	while (true)
 	{
