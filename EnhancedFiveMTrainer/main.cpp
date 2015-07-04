@@ -8,12 +8,10 @@ https://github.com/gtav-ent/GTAV-EnhancedNativeTrainer
 (C) Rob Pridham and fellow contributors 2015
 */
 
-#include "inc\main.h"
+
 #include "script.h"
 #include "keyboard.h"
-#include "config_io.h"
 
-#include <thread>
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 {

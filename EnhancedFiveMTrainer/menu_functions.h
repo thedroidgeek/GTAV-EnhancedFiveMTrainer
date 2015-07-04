@@ -10,22 +10,14 @@ https://github.com/gtav-ent/GTAV-EnhancedNativeTrainer
 
 #pragma once
 
-#include "inc\natives.h"
-#include "inc\types.h"
-#include "inc\enums.h"
-
-#include "inc\main.h"
-
 #include "script.h"
 #include "io.h"
 
-#include <string>
 #include <sstream> 
 
-#include <ctime>
 #include <vector>
 
-#pragma warning(disable : 4244 4305) // double <-> float conversions
+#pragma warning(disable : 4244 4838) // double <-> float and float <-> int conversions
 
 extern void(*periodic_feature_call)(void);
 

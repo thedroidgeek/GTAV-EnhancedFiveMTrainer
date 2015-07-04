@@ -8,10 +8,7 @@ https://github.com/gtav-ent/GTAV-EnhancedNativeTrainer
 (C) Rob Pridham and fellow contributors 2015
 */
 
-#include "io.h"
 #include "config_io.h"
-#include <string>
-#include <sstream>
 
 DWORD trainerResetTime = 0;
 

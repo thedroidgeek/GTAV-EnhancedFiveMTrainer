@@ -5,9 +5,6 @@ https://github.com/gtav-ent/GTAV-EnhancedNativeTrainer
 */
 
 #include "config_io.h"
-#include "keyboard.h"
-#include "script.h"
-#include <sstream>
 
 // A global Windows "basic string". Actual memory is allocated by the
 // COM methods used by MSXML which take &bstr. We must use SysFreeString() 

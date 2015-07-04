@@ -16,8 +16,5 @@ https://github.com/gtav-ent/GTAV-EnhancedNativeTrainer
 
 #include "inc\main.h"
 
-#include "menu_functions.h"
-
-#include <fstream>
 
 void ScriptMain();

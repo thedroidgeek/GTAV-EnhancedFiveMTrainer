@@ -10,14 +10,6 @@ https://github.com/gtav-ent/GTAV-EnhancedNativeTrainer
 
 #pragma once
 
-#include "inc\natives.h"
-#include "inc\types.h"
-#include "inc\enums.h"
-
-#include "inc\main.h"
-
-#include "keyboard.h"
-
 bool get_key_pressed(int nVirtKey);
 
 void get_button_state(bool *a, bool *b, bool *up, bool *down, bool *l, bool *r);

@@ -22,21 +22,6 @@
 #include "menu_functions.h"
 #include "script.h"
 
-#include <string>
-#include <sstream> 
-#include <fstream>
-#include <thread>
-
-#include <ctime>
-#include <cctype>
-#include <vector>
-
-#include <locale>
-#include <iostream>
-#include <iomanip>
-
-#pragma warning(disable : 4244 4305) // double <-> float conversions
-
 
 struct playerinfo {
 	std::string name;
@@ -56,8 +41,7 @@ int playerCount = 0;
 Vehicle ownedveh;
 bool ownedvehlocked = false;
 
-
-bool playerWasDisconnected = true; // To skip conditions for first iteration of creation of blips and stuff
+bool playerWasDisconnected = true;
 
 bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerBlipCone, featurePlayerNotifications;
 bool featurePlayerBlipsUpdated = false;
@@ -97,65 +81,65 @@ void updateStuff()
 				return;
 			}
 
-				if (i != playerId)
+			if (i != playerId)
+			{
+				Ped pedId = PLAYER::GET_PLAYER_PED(i);
+				if (ENTITY::DOES_ENTITY_EXIST(pedId))
 				{
-					Ped pedId = PLAYER::GET_PLAYER_PED(i);
-					if (ENTITY::DOES_ENTITY_EXIST(pedId))
+					std::string name = (char*)PLAYER::GET_PLAYER_NAME(i);
+					uint32_t headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
+
+					if (featurePlayerHeadDisplay && UI::_0x4E929E7A5796FD26(headDisplayId))
 					{
-						std::string name = (char*)PLAYER::GET_PLAYER_NAME(i);
-						uint32_t headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
-
-						if (featurePlayerHeadDisplay && UI::_0x4E929E7A5796FD26(headDisplayId))
-						{
-							UI::_0xDEA2B8283BAA3944(headDisplayId, (Any*)name.c_str()); // SET_HEAD_DISPLAY_STRING
-							UI::_0x63BB75ABEDC1F6A0(headDisplayId, 0, 1); // SET_HEAD_DISPLAY_FLAG
-							playerdb[i].head = headDisplayId;
-						}
-
-						if (playerWasDisconnected || !UI::DOES_BLIP_EXIST(playerdb[i].blip))
-						{
-							if (featurePlayerBlips)
-							{
-								playerdb[i].blip = UI::ADD_BLIP_FOR_ENTITY(pedId);
-								UI::SET_BLIP_COLOUR(playerdb[i].blip, 0);
-								UI::SET_BLIP_SCALE(playerdb[i].blip, 0.8);
-								if (featurePlayerBlipCone)
-									UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
-								UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
-							}
-
-							if (playerWasDisconnected || playerdb[i].name != name) // Making sure the player wasn't already here and only changed his ped (ex. skin change)
-							{
-								if (featurePlayerNotifications)
-								{
-									std::string msg = "<C>" + name + "</C>~s~ joined.";
-									show_notification((char*)msg.c_str());
-								}
-
-								PED::SET_CAN_ATTACK_FRIENDLY(i, 1, 1);
-								playerdb[i].name = name;
-								playerCount++;
-							}
-							playerdb[i].ped = pedId;
-						}
+						UI::_0xDEA2B8283BAA3944(headDisplayId, (Any*)name.c_str()); // SET_HEAD_DISPLAY_STRING
+						UI::_0x63BB75ABEDC1F6A0(headDisplayId, 0, 1); // SET_HEAD_DISPLAY_FLAG
+						playerdb[i].head = headDisplayId;
 					}
-					else if (playerdb[i].name != "")
+
+					if (playerWasDisconnected || !UI::DOES_BLIP_EXIST(playerdb[i].blip))
 					{
-						if (featurePlayerNotifications)
+						if (featurePlayerBlips)
 						{
-							std::string msg = "<C>" + playerdb[i].name + "</C>~s~ left.";
-							show_notification((char*)msg.c_str());
+							playerdb[i].blip = UI::ADD_BLIP_FOR_ENTITY(pedId);
+							UI::SET_BLIP_COLOUR(playerdb[i].blip, 0);
+							UI::SET_BLIP_SCALE(playerdb[i].blip, 0.8);
+							if (featurePlayerBlipCone)
+								UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
+							UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
 						}
 
-						if (UI::_0x4E929E7A5796FD26(playerdb[i].head))
-							UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
-						if (UI::DOES_BLIP_EXIST(playerdb[i].blip))
-							UI::REMOVE_BLIP((Any*)&playerdb[i].blip);
+						if (playerWasDisconnected || playerdb[i].name != name) // Making sure the player wasn't already here and only changed his ped (ex. skin change)
+						{
+							if (featurePlayerNotifications)
+							{
+								std::string msg = "<C>" + name + "</C>~s~ joined.";
+								show_notification((char*)msg.c_str());
+							}
 
-						playerdb[i].name = "";
-						playerCount--;
+							PED::SET_CAN_ATTACK_FRIENDLY(i, 1, 1);
+							playerdb[i].name = name;
+							playerCount++;
+						}
+						playerdb[i].ped = pedId;
 					}
 				}
+				else if (playerdb[i].name != "")
+				{
+					if (featurePlayerNotifications)
+					{
+						std::string msg = "<C>" + playerdb[i].name + "</C>~s~ left.";
+						show_notification((char*)msg.c_str());
+					}
+
+					if (UI::_0x4E929E7A5796FD26(playerdb[i].head))
+						UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
+					if (UI::DOES_BLIP_EXIST(playerdb[i].blip))
+						UI::REMOVE_BLIP((Any*)&playerdb[i].blip);
+
+					playerdb[i].name = "";
+					playerCount--;
+				}
+			}
 		}
 		playerWasDisconnected = false;
 	}
@@ -164,10 +148,8 @@ void updateStuff()
 		playerWasDisconnected = true;
 		playerCount = 0;
 
-		if (trainer_switch_pressed()) {
+		if (trainer_switch_pressed())
 			set_menu_showing(true);
-			return;
-		}
 	}
 }
 
@@ -178,7 +160,7 @@ void updateStuff()
 
 int activeLineIndexPlayer = 0;
 
-void process_player_menu(bool(*onConfirmation)(MenuItem<int> value))
+void process_player_menu(bool(*onConfirmation)(MenuItem<int> value), bool warningMsg)
 {
 	if (NETWORK::NETWORK_IS_SESSION_STARTED())
 	{
@@ -188,6 +170,9 @@ void process_player_menu(bool(*onConfirmation)(MenuItem<int> value))
 		}
 		else
 		{
+			if(warningMsg)
+				show_notification("Please don't abuse this feature and annoy other players.");
+
 			const int lineCount = playerCount;
 
 			std::string caption = std::to_string(lineCount) + " CONNECTED PLAYER" + ( lineCount > 1 ? "S" : "" );
@@ -326,7 +311,7 @@ bool onconfirm_playerteleport_menu(MenuItem<int> choice)
 	{
 		show_notification("Could not get player's ped.");
 		show_notification("Player list refreshed, please try again.");
-		process_player_menu(onconfirm_playerteleport_menu);
+		process_player_menu(onconfirm_playerteleport_menu, 0);
 		return true; // Returned true as onConfirmation() to close the old menu since we processed a new updated one
 	}
 
@@ -708,8 +693,7 @@ bool onconfirm_main_menu(MenuItem<int> choice)
 	switch (activeLineIndexMain)
 	{
 	case 0:
-		show_notification("Please don't abuse this feature and annoy other players.");
-		process_player_menu(onconfirm_playerteleport_menu);
+		process_player_menu(onconfirm_playerteleport_menu, 1);
 		break;
 	case 1:
 		process_anim_menu();

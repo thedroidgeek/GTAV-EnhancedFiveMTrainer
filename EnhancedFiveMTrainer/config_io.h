@@ -4,10 +4,6 @@ https://github.com/gtav-ent/GTAV-EnhancedNativeTrainer
 (C) Rob Pridham and fellow contributors 2015
 */
 
-#include <stdio.h>
-#include <tchar.h>
-#include <windows.h>
-
 #pragma warning(disable : 4192) //ignore automatically excluding while importing type library warnings
 
 #import <msxml6.dll> //read the GitHub project readme regarding what you need to make this work

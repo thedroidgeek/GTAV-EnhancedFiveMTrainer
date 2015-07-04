@@ -5,9 +5,6 @@
 */
 
 #include "keyboard.h"
-#include "script.h"
-
-#include <sstream>
 
 const int KEYS_SIZE = 255;
 
