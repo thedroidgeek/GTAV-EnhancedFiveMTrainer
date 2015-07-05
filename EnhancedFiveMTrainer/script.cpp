@@ -135,7 +135,7 @@ void updateStuff()
 					if (UI::_0x4E929E7A5796FD26(playerdb[i].head))
 						UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
 					if (UI::DOES_BLIP_EXIST(playerdb[i].blip))
-						UI::REMOVE_BLIP((Any*)&playerdb[i].blip);
+						UI::REMOVE_BLIP(&playerdb[i].blip);
 
 					playerdb[i].name = "";
 					playerCount--;
@@ -641,7 +641,7 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 			for (int i = 0; i < MAX_PLAYERS; i++)
 			{
 				if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
-					UI::REMOVE_BLIP((Any*)&playerdb[i].blip);
+					UI::REMOVE_BLIP(&playerdb[i].blip);
 			}
 		}
 		featurePlayerBlipsUpdated = false;
