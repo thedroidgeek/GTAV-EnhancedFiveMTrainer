@@ -83,10 +83,10 @@ void updateStuff()
 
 			if (i != playerId)
 			{
-				Ped pedId = PLAYER::GET_PLAYER_PED(i);
-				if (ENTITY::DOES_ENTITY_EXIST(pedId))
+				if (NETWORK::NETWORK_IS_PLAYER_CONNECTED(i))
 				{
 					std::string name = (char*)PLAYER::GET_PLAYER_NAME(i);
+					Ped pedId = PLAYER::GET_PLAYER_PED(i);
 					uint32_t headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
 
 					if (featurePlayerHeadDisplay && UI::_0x4E929E7A5796FD26(headDisplayId))
