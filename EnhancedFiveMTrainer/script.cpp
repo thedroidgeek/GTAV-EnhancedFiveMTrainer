@@ -127,7 +127,7 @@ void updateStuff()
 						{
 							if (featurePlayerNotifications)
 							{
-								std::string msg = "<C>" + name + "</C>~s~ joined.";
+								std::string msg = "<C>" + name + "</C> joined.";
 								show_notification((char*)msg.c_str());
 							}
 
@@ -142,7 +142,7 @@ void updateStuff()
 			{
 				if (featurePlayerNotifications)
 				{
-					std::string msg = "<C>" + playerdb[i].name + "</C>~s~ left.";
+					std::string msg = "<C>" + playerdb[i].name + "</C> left.";
 					show_notification((char*)msg.c_str());
 				}
 
@@ -196,7 +196,7 @@ void process_player_menu(bool(*onConfirmation)(MenuItem<int> value), bool warnin
 
 		if (lineCount == 0)
 		{
-			show_notification("Do you feel foverer alone ?");
+			show_notification("Do you feel forever alone ?");
 			return;
 		}
 
@@ -283,7 +283,7 @@ void process_vehicle_menu()
 		{ "Lock Owned Vehicle", NULL, NULL, true },
 		{ "Unlock Owned Vehicle", NULL, NULL, true },
 		{ "Kick Owned Vehicle's Current Driver", NULL, NULL, true },
-		{ "Retreive Owned Vehicle", NULL, NULL, true },
+		{ "Retrieve Owned Vehicle", NULL, NULL, true },
 		{ "Explode Owned Vehicle", NULL, NULL, true }
 	};
 
@@ -589,7 +589,7 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 				show_notification("DEBUG: Failed to obtain control of entity.");
 			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ownedveh, mypos.x, mypos.y, mypos.z, 0, 0, 1);
 			VEHICLE::SET_VEHICLE_FIXED(ownedveh);
-			show_notification("Your vehicle was retreived and fixed, you're welcome.");
+			show_notification("Your vehicle was retrieved and fixed, you're welcome.");
 		}
 		else
 			show_notification("Owned vehicle not found.");
