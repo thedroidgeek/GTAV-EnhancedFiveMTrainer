@@ -83,24 +83,24 @@ void updateStuff()
 				set_menu_showing(true);     // since this is a consuming function.
 				return;
 			}
-			if (featureVoiceChatSpeaker)
+			if (featureVoiceChatSpeaker && isVoiceChatRunning)
 				update_status_text();
 
-			if (i != playerId)
+			if (NETWORK::NETWORK_IS_PLAYER_CONNECTED(i))
 			{
-				if (NETWORK::NETWORK_IS_PLAYER_CONNECTED(i))
+				std::string name = (char*)PLAYER::GET_PLAYER_NAME(i);
+
+				if (featureVoiceChatSpeaker && NETWORK::NETWORK_IS_PLAYER_TALKING(i))
 				{
-					std::string name = (char*)PLAYER::GET_PLAYER_NAME(i);
-
-					if (featureVoiceChatSpeaker && NETWORK::NETWORK_IS_PLAYER_TALKING(i))
-					{
-						if (!isVoiceChatRunning) {
-							voice_status_msg = "Currently Talking:";
-							isVoiceChatRunning = true;
-						}
-						voice_status_msg += "~n~" + name;
+					if (!isVoiceChatRunning) {
+						voice_status_msg = "Currently Talking:";
+						isVoiceChatRunning = true;
 					}
+					voice_status_msg += "~n~" + name;
+				}
 
+				if (i != playerId)
+				{
 					Ped pedId = PLAYER::GET_PLAYER_PED(i);
 					uint32_t headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
 
@@ -169,9 +169,6 @@ void updateStuff()
 
 		if (trainer_switch_pressed())
 			set_menu_showing(true);
-
-		if (featureVoiceChatSpeaker)
-			update_status_text();
 	}
 }
 
