@@ -36,7 +36,6 @@ playerinfo playerdb[MAX_PLAYERS];
 
 std::vector<int> playerIdForMenuEntries;
 
-int playerCount = 0;
 
 Vehicle ownedveh;
 bool ownedvehlocked = false;
@@ -134,27 +133,25 @@ void updateStuff()
 
 							PED::SET_CAN_ATTACK_FRIENDLY(i, 1, 1);
 							playerdb[i].name = name;
-							playerCount++;
 						}
 						playerdb[i].ped = pedId;
 					}
 				}
-				else if (playerdb[i].name != "")
+			}
+			else if (playerdb[i].name != "")
+			{
+				if (featurePlayerNotifications)
 				{
-					if (featurePlayerNotifications)
-					{
-						std::string msg = "<C>" + playerdb[i].name + "</C>~s~ left.";
-						show_notification((char*)msg.c_str());
-					}
-
-					if (UI::_0x4E929E7A5796FD26(playerdb[i].head))
-						UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
-					if (UI::DOES_BLIP_EXIST(playerdb[i].blip))
-						UI::REMOVE_BLIP(&playerdb[i].blip);
-
-					playerdb[i].name = "";
-					playerCount--;
+					std::string msg = "<C>" + playerdb[i].name + "</C>~s~ left.";
+					show_notification((char*)msg.c_str());
 				}
+
+				if (UI::_0x4E929E7A5796FD26(playerdb[i].head))
+					UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
+				if (UI::DOES_BLIP_EXIST(playerdb[i].blip))
+					UI::REMOVE_BLIP(&playerdb[i].blip);
+
+				playerdb[i].name = "";
 			}
 		}
 		playerWasDisconnected = false;
@@ -165,7 +162,6 @@ void updateStuff()
 	else
 	{
 		playerWasDisconnected = true;
-		playerCount = 0;
 
 		if (trainer_switch_pressed())
 			set_menu_showing(true);
@@ -183,38 +179,33 @@ void process_player_menu(bool(*onConfirmation)(MenuItem<int> value), bool warnin
 {
 	if (NETWORK::NETWORK_IS_SESSION_STARTED())
 	{
-		if (playerCount == 0)
+		std::vector<StandardOrToggleMenuDef> lines_v;
+
+		playerIdForMenuEntries.clear();
+		for (int i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (playerdb[i].name != "")
+			{
+				std::string linetxt = "[ID: " + std::to_string(i) + "] " + playerdb[i].name;
+				playerIdForMenuEntries.push_back(i);
+				lines_v.push_back({ linetxt, NULL, NULL, true });
+			}
+		}
+
+		const int lineCount = (int)lines_v.size();
+
+		if (lineCount == 0)
 		{
 			show_notification("Do you feel foverer alone ?");
+			return;
 		}
-		else
-		{
-			if(warningMsg)
-				show_notification("Please don't abuse this feature and annoy other players.");
 
-			const int lineCount = playerCount;
+		std::string caption = std::to_string(lineCount) + " CONNECTED PLAYER" + (lineCount == 1 ? "" : "S");
 
-			std::string caption = std::to_string(lineCount) + " CONNECTED PLAYER" + ( lineCount > 1 ? "S" : "" );
+		if (warningMsg)
+			show_notification("Please don't abuse this feature and annoy other players.");
 
-			StandardOrToggleMenuDef *lines = new StandardOrToggleMenuDef[lineCount];
-
-			int ind = 0;
-			playerIdForMenuEntries.clear();
-			for (int i = 0; i < MAX_PLAYERS; i++)
-			{
-				if (playerdb[i].name != "")
-				{
-					std::string linetxt = "[ID: " + std::to_string(i) + "] " + playerdb[i].name;
-					playerIdForMenuEntries.push_back(i);
-					lines[ind] = { linetxt, NULL, NULL, true };
-					ind++;
-				}
-			}
-
-			draw_menu_from_struct_def(lines, lineCount, &activeLineIndexPlayer, caption, onConfirmation);
-
-			delete[] lines;
-		}
+		draw_menu_from_struct_def(&lines_v[0], lineCount, &activeLineIndexPlayer, caption, onConfirmation);
 	}
 	else
 	{
