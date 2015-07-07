@@ -43,7 +43,7 @@ bool ownedvehlocked = false;
 
 bool playerWasDisconnected = true;
 
-bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerBlipCone, featurePlayerNotifications;
+bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerBlipCone, featurePlayerNotifications, featureVoiceChatSpeaker = false;
 bool featurePlayerBlipsUpdated = false;
 bool featurePlayerHeadDisplayUpdated = false;
 bool featurePlayerBlipConeUpdated = false;
@@ -74,18 +74,33 @@ void updateStuff()
 			PED::SET_CAN_ATTACK_FRIENDLY(playerId, 1, 1);
 		}
 
+		std::string voice_status_msg;
+		bool isVoiceChatRunning = false;
+
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (trainer_switch_pressed()) { // To increase chances of trainer switch key capture,
 				set_menu_showing(true);     // since this is a consuming function.
 				return;
 			}
+			if (featureVoiceChatSpeaker)
+				update_status_text();
 
 			if (i != playerId)
 			{
 				if (NETWORK::NETWORK_IS_PLAYER_CONNECTED(i))
 				{
 					std::string name = (char*)PLAYER::GET_PLAYER_NAME(i);
+
+					if (featureVoiceChatSpeaker && NETWORK::NETWORK_IS_PLAYER_TALKING(i))
+					{
+						if (!isVoiceChatRunning) {
+							voice_status_msg = "Currently Talking:";
+							isVoiceChatRunning = true;
+						}
+						voice_status_msg += "~n~" + name;
+					}
+
 					Ped pedId = PLAYER::GET_PLAYER_PED(i);
 					uint32_t headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
 
@@ -143,6 +158,9 @@ void updateStuff()
 			}
 		}
 		playerWasDisconnected = false;
+
+		if(isVoiceChatRunning)
+			set_status_text(voice_status_msg);
 	}
 	else
 	{
@@ -151,6 +169,9 @@ void updateStuff()
 
 		if (trainer_switch_pressed())
 			set_menu_showing(true);
+
+		if (featureVoiceChatSpeaker)
+			update_status_text();
 	}
 }
 
@@ -249,10 +270,11 @@ void process_misc_menu()
 {
 	std::string caption = "MISCELLANEOUS";
 
-	const int lineCount = 1;
+	const int lineCount = 2;
 
 	StandardOrToggleMenuDef lines[lineCount] = {
-		{ "Basic Vehicle Management System", NULL, NULL, false }
+		{ "Basic Vehicle Management System", NULL, NULL, false },
+		{ "Show Voice Chat Speaker", &featureVoiceChatSpeaker, NULL, true }
 	};
 
 	draw_menu_from_struct_def(lines, lineCount, &activeLineIndexMisc, caption, onconfirm_misc_menu);
