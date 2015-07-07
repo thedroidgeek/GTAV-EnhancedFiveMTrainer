@@ -170,12 +170,13 @@ void update_status_text()
 {
 	if (GetTickCount() < statusTextDrawTicksMax)
 	{
-		UI::SET_TEXT_FONT(0);
+		UI::SET_TEXT_FONT(4);
 		UI::SET_TEXT_SCALE(0.55, 0.55);
 		UI::SET_TEXT_COLOUR(255, 255, 255, 255);
 		UI::SET_TEXT_WRAP(0.0, 1.0);
 		UI::SET_TEXT_CENTRE(1);
-		UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
+		UI::SET_TEXT_OUTLINE();
+		UI::SET_TEXT_DROPSHADOW(5, 0, 78, 255, 255);
 		UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
 		if (statusTextGxtEntry)
 		{
@@ -186,7 +187,7 @@ void update_status_text()
 			UI::_SET_TEXT_ENTRY("STRING");
 			UI::_ADD_TEXT_COMPONENT_STRING((char *)statusText.c_str());
 		}
-		UI::_DRAW_TEXT(0.5, 0.5);
+		UI::_DRAW_TEXT(0.5, 0);
 	}
 }
 
