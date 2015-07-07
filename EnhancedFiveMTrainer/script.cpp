@@ -27,7 +27,7 @@ struct playerinfo {
 	std::string name;
 	Ped ped;
 	int blip;
-	uint32_t head;
+	unsigned int head;
 };
 
 Player playerId;
@@ -102,7 +102,7 @@ void updateStuff()
 				if (i != playerId)
 				{
 					Ped pedId = PLAYER::GET_PLAYER_PED(i);
-					uint32_t headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
+					unsigned int headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
 
 					if (featurePlayerHeadDisplay && UI::_0x4E929E7A5796FD26(headDisplayId))
 					{
