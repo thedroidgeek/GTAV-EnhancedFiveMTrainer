@@ -3,5 +3,4 @@ A GTA V trainer made to enhance the FiveM (a GTA V multiplayer modification: htt
 
 **Downloads go [here](https://github.com/thedroidgeek/GTAV-EnhancedFiveMTrainer/releases).**
 
-The trainer menu code was took from the Enhanced Native Trainer.
-Check their project: https://github.com/gtav-ent/GTAV-EnhancedNativeTrainer
+The trainer menu was based from the [Enhanced Native Trainer](http://gtav-ent.github.io/GTAV-EnhancedNativeTrainer/) (© Rob Pridham and fellow contributors 2015)
