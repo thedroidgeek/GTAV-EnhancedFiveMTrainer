@@ -434,7 +434,7 @@ bool onconfirm_animation_menu(MenuItem<int> choice)
 	STREAMING::REQUEST_ANIM_DICT(dict);
 	while (!STREAMING::HAS_ANIM_DICT_LOADED(dict))
 		WAIT(0);
-	AI::TASK_PLAY_ANIM(playerPed, dict, anim, 1, -1, -1, 16, 0, 0, 0, 0);
+	AI::TASK_PLAY_ANIM(playerPed, dict, anim, 1, -1, -1, 48, 0, 0, 0, 0);
 
 	return false;
 }
