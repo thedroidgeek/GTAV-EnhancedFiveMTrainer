@@ -14,7 +14,7 @@
   */
 
 
-#define TRAINER_VERSION "1.4"
+#define TRAINER_VERSION "1.5"
 #define MAX_PLAYERS 32
 
 #include "io.h"
