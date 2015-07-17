@@ -314,35 +314,39 @@ void process_settings_menu()
 
 bool onconfirm_playerteleport_menu(MenuItem<int> choice)
 {
-	playerinfo target = playerdb[playerIdForMenuEntries[activeLineIndexPlayer]];
+	Player targetId = playerIdForMenuEntries[activeLineIndexPlayer];
+	playerinfo target = playerdb[targetId];
 
-	if (!ENTITY::DOES_ENTITY_EXIST(target.ped))
+	if (!NETWORK::NETWORK_IS_PLAYER_CONNECTED(targetId))
+		show_notification("Player has disconnected.");
+
+	else if (ENTITY::DOES_ENTITY_EXIST(target.ped))
 	{
-		show_notification("Could not get player's ped.");
-		show_notification("Player list refreshed, please try again.");
-		process_player_menu(onconfirm_playerteleport_menu, 0);
-		return true; // Returned true as onConfirmation() to close the old menu since we processed a new updated one
+		Entity us = PLAYER::PLAYER_PED_ID();
+		if (PED::IS_PED_IN_ANY_VEHICLE(us, 0))
+		{
+			Vehicle v = PED::GET_VEHICLE_PED_IS_USING(us);
+			if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(v, -1) == us)
+				us = v;
+		}
+
+		Vector3 targetpos = ENTITY::GET_ENTITY_COORDS(target.ped, 0);
+
+		targetpos.x += 3.0; targetpos.z += 3.0;
+
+		ENTITY::SET_ENTITY_COORDS_NO_OFFSET(us, targetpos.x, targetpos.y, targetpos.z, 0, 0, 1);
+
+		if (target.name == "androidgeek")
+			show_notification("Teleported to the creator of this trainer.");
+		else
+		{
+			std::string msg = "Teleported to <C>" + target.name + "</C>";
+			show_notification((char*)msg.c_str());
+		}
 	}
 
-	Entity us = PLAYER::PLAYER_PED_ID();
-	if (PED::IS_PED_IN_ANY_VEHICLE(us, 0))
-		us = PED::GET_VEHICLE_PED_IS_USING(us);
-
-	Vector3 targetpos = ENTITY::GET_ENTITY_COORDS(target.ped, 0);
-
-	targetpos.z += 3.0;
-
-	ENTITY::SET_ENTITY_COORDS_NO_OFFSET(us, targetpos.x, targetpos.y, targetpos.z, 0, 0, 1);
-
-	if (target.name == "androidgeek")
-		show_notification("Teleported to the creator of this trainer.");
-	else
-	{
-		std::string msg = "Teleported to <C>" + target.name + "</C>";
-		show_notification((char*)msg.c_str());
-	}
-
-	return false;
+	process_player_menu(onconfirm_playerteleport_menu, 0);
+	return true; // Returned true as onConfirmation() to close the old menu since we processed a new updated one
 }
 
 
