@@ -73,7 +73,7 @@ void updateStuff()
 			PED::SET_CAN_ATTACK_FRIENDLY(playerId, 1, 1);
 		}
 
-		std::string voice_status_msg;
+		std::string voice_status_msg = "Currently Talking:";
 		bool isVoiceChatRunning = false;
 
 		for (int i = 0; i < MAX_PLAYERS; i++)
@@ -91,10 +91,8 @@ void updateStuff()
 
 				if (featureVoiceChatSpeaker && NETWORK::NETWORK_IS_PLAYER_TALKING(i))
 				{
-					if (!isVoiceChatRunning) {
-						voice_status_msg = "Currently Talking:";
+					if (!isVoiceChatRunning)
 						isVoiceChatRunning = true;
-					}
 					voice_status_msg += "~n~" + name;
 				}
 
@@ -117,10 +115,10 @@ void updateStuff()
 							playerdb[i].blip = UI::ADD_BLIP_FOR_ENTITY(pedId);
 							UI::SET_BLIP_COLOUR(playerdb[i].blip, 0);
 							UI::SET_BLIP_SCALE(playerdb[i].blip, 0.8);
-							UI::SET_BLIP_CATEGORY(playerdb[i].blip, 7);
 							if (featurePlayerBlipCone)
 								UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
 							UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
+							UI::SET_BLIP_CATEGORY(playerdb[i].blip, 7);
 						}
 
 						if (playerWasDisconnected || playerdb[i].name != name) // Making sure the player wasn't already here and only changed his ped (ex. skin change)
@@ -471,7 +469,6 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 				show_notification("Your current vehicle has been set as owned.");
 			}
 			else {
-				ownedveh = NULL;
 				ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&ownedveh);
 				show_notification("You can't own a vehicle you're not driving.");
 			}
@@ -572,20 +569,20 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 			Vector3 mypos = ENTITY::GET_ENTITY_COORDS(playerPed, 0);
 			AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPed);
 			int tick = 0;
-			while (tick < 500 && !PED::IS_PED_IN_ANY_VEHICLE(playerPed, 0)) {
+			while (tick < 200 && !PED::IS_PED_IN_ANY_VEHICLE(playerPed, 0)) {
 				AI::TASK_WARP_PED_INTO_VEHICLE(playerPed, ownedveh, -1);
 				WAIT(0);
 				tick++;
 			}
-			if (tick == 500)
+			if (tick == 200)
 				show_notification("DEBUG: Failed to warp to vehicle.");
 			NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(ownedveh);
 			tick = 0;
-			while (tick < 500 && !NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(ownedveh)) {
+			while (tick < 200 && !NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(ownedveh)) {
 				WAIT(0);
 				tick++;
 			}
-			if (tick == 500)
+			if (tick == 200)
 				show_notification("DEBUG: Failed to obtain control of entity.");
 			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ownedveh, mypos.x, mypos.y, mypos.z, 0, 0, 1);
 			VEHICLE::SET_VEHICLE_FIXED(ownedveh);
@@ -607,11 +604,11 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 			}
 			NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(ownedveh);
 			int tick = 0;
-			while (tick < 500 && !NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(ownedveh)) {
+			while (tick < 200 && !NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(ownedveh)) {
 				WAIT(0);
 				tick++;
 			}
-			if (tick == 500)
+			if (tick == 200)
 				show_notification("DEBUG: Failed to obtain control of entity.");
 			ENTITY::SET_ENTITY_INVINCIBLE(ownedveh, 0);
 			NETWORK::NETWORK_EXPLODE_VEHICLE(ownedveh, 1, 0, 0);
@@ -639,10 +636,10 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 					playerdb[i].blip = UI::ADD_BLIP_FOR_ENTITY((playerdb[i].ped));
 					UI::SET_BLIP_COLOUR(playerdb[i].blip, 0);
 					UI::SET_BLIP_SCALE(playerdb[i].blip, 0.8);
-					UI::SET_BLIP_CATEGORY(playerdb[i].blip, 7);
 					if (featurePlayerBlipCone)
 						UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
 					UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
+					UI::SET_BLIP_CATEGORY(playerdb[i].blip, 7);
 				}
 			}
 		}
