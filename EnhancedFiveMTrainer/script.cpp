@@ -93,7 +93,7 @@ void updateStuff()
 				{
 					if (!isVoiceChatRunning)
 						isVoiceChatRunning = true;
-					voice_status_msg += "~n~" + name;
+					voice_status_msg += "~b~~n~" + name;
 				}
 
 				if (i != playerId)
@@ -125,7 +125,7 @@ void updateStuff()
 						{
 							if (featurePlayerNotifications)
 							{
-								std::string msg = "<C>" + name + "</C> joined.";
+								std::string msg = "~b~<C>" + name + "</C>~s~ joined.";
 								show_notification((char*)msg.c_str());
 							}
 
@@ -140,7 +140,7 @@ void updateStuff()
 			{
 				if (featurePlayerNotifications)
 				{
-					std::string msg = "<C>" + playerdb[i].name + "</C> left.";
+					std::string msg = "~b~<C>" + playerdb[i].name + "</C>~s~ left.";
 					show_notification((char*)msg.c_str());
 				}
 
@@ -340,7 +340,7 @@ bool onconfirm_playerteleport_menu(MenuItem<int> choice)
 			show_notification("Teleported to the creator of this trainer.");
 		else
 		{
-			std::string msg = "Teleported to <C>" + target.name + "</C>";
+			std::string msg = "Teleported to ~b~<C>" + target.name + "</C>";
 			show_notification((char*)msg.c_str());
 		}
 	}
