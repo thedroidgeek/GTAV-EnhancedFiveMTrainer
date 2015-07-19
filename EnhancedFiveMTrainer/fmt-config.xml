@@ -32,6 +32,7 @@
     <setting function="player_head_display" value="1"/>
     <setting function="player_blip_cone" value="0"/>
     <setting function="player_notifications" value="1"/>
+    <setting function="show_speaking_players" value="1"/>
 
   </settings>
 

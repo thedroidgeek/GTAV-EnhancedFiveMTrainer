@@ -762,6 +762,7 @@ void main()
 	featurePlayerHeadDisplay = config->get_trainer_config()->setting_player_head_display;
 	featurePlayerBlipCone = config->get_trainer_config()->setting_player_blip_cone;
 	featurePlayerNotifications = config->get_trainer_config()->setting_player_notifications;
+	featureVoiceChatSpeaker = config->get_trainer_config()->setting_show_speaking_players;
 
 	while (true)
 	{
