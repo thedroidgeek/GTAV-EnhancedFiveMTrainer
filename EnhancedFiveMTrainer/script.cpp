@@ -42,7 +42,7 @@ bool ownedvehlocked = false;
 
 bool playerWasDisconnected = true;
 
-bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerBlipCone, featurePlayerNotifications, featureVoiceChatSpeaker = false;
+bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerBlipCone, featurePlayerNotifications, featureVoiceChatSpeaker;
 bool featurePlayerBlipsUpdated = false;
 bool featurePlayerHeadDisplayUpdated = false;
 bool featurePlayerBlipConeUpdated = false;
@@ -762,6 +762,7 @@ void main()
 	featurePlayerHeadDisplay = config->get_trainer_config()->setting_player_head_display;
 	featurePlayerBlipCone = config->get_trainer_config()->setting_player_blip_cone;
 	featurePlayerNotifications = config->get_trainer_config()->setting_player_notifications;
+	featureVoiceChatSpeaker = config->get_trainer_config()->setting_show_voice_chat_speaker;
 
 	while (true)
 	{
