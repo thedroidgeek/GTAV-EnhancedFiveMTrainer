@@ -148,9 +148,9 @@ void SettingsConfig::set_param(char* function, char* value)
 		{
 			setting_player_notifications = result;
 		}
-		else if (strcmp(function, "show_speaking_players") == 0)
+		else if (strcmp(function, "show_voice_chat_speaker") == 0)
 		{
-			setting_show_speaking_players = result;
+			setting_show_voice_chat_speaker = result;
 		}
 	}
 };

@@ -29,7 +29,7 @@ public:
 	bool setting_player_head_display = 1;
 	bool setting_player_blip_cone = 0;
 	bool setting_player_notifications = 1;
-	bool setting_show_speaking_players = 1;
+	bool setting_show_voice_chat_speaker = 0;
 
 	/**Change the key binding and settings using a function string and key string.*/
 	void set_param(char* function, char* value);
