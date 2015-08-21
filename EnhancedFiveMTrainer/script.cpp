@@ -101,11 +101,12 @@ void updateStuff()
 					Ped pedId = PLAYER::GET_PLAYER_PED(i);
 					unsigned int headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
 
-					if (featurePlayerHeadDisplay && UI::_0x4E929E7A5796FD26(headDisplayId))
+					if (UI::_0x4E929E7A5796FD26(headDisplayId))
 					{
-						UI::_0xDEA2B8283BAA3944(headDisplayId, (Any*)name.c_str()); // SET_HEAD_DISPLAY_STRING
-						UI::_0x63BB75ABEDC1F6A0(headDisplayId, 0, 1); // SET_HEAD_DISPLAY_FLAG
 						playerdb[i].head = headDisplayId;
+						if (featurePlayerHeadDisplay)
+							UI::_0xDEA2B8283BAA3944(headDisplayId, (Any*)name.c_str()); // SET_HEAD_DISPLAY_STRING
+						UI::_0x63BB75ABEDC1F6A0(headDisplayId, 0, 1); // SET_HEAD_DISPLAY_FLAG
 					}
 
 					if (playerWasDisconnected || !UI::DOES_BLIP_EXIST(playerdb[i].blip))
