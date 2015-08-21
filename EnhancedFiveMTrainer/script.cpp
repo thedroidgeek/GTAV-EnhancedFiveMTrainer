@@ -42,10 +42,7 @@ bool ownedvehlocked = false;
 
 bool playerWasDisconnected = true;
 
-bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerBlipCone, featurePlayerNotifications, featureVoiceChatSpeaker;
-bool featurePlayerBlipsUpdated = false;
-bool featurePlayerHeadDisplayUpdated = false;
-bool featurePlayerBlipConeUpdated = false;
+bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerBlipCone, featurePlayerNotifications, featureShowVoiceChatSpeaker;
 
 
 bool onconfirm_playerteleport_menu(MenuItem<int> choice);
@@ -82,14 +79,14 @@ void updateStuff()
 				set_menu_showing(true);     // since this is a consuming function.
 				return;
 			}
-			if (featureVoiceChatSpeaker && isVoiceChatRunning)
+			if (featureShowVoiceChatSpeaker && isVoiceChatRunning)
 				update_status_text();
 
 			if (NETWORK::NETWORK_IS_PLAYER_CONNECTED(i))
 			{
 				std::string name = (char*)PLAYER::GET_PLAYER_NAME(i);
 
-				if (featureVoiceChatSpeaker && NETWORK::NETWORK_IS_PLAYER_TALKING(i))
+				if (featureShowVoiceChatSpeaker && NETWORK::NETWORK_IS_PLAYER_TALKING(i))
 				{
 					if (!isVoiceChatRunning)
 						isVoiceChatRunning = true;
@@ -261,7 +258,7 @@ void process_misc_menu()
 
 	StandardOrToggleMenuDef lines[lineCount] = {
 		{ "Basic Vehicle Management System", NULL, NULL, false },
-		{ "Show Voice Chat Speaker", &featureVoiceChatSpeaker, NULL, true }
+		{ "Show Voice Chat Speaker", &featureShowVoiceChatSpeaker, NULL, true }
 	};
 
 	draw_menu_from_struct_def(lines, lineCount, &activeLineIndexMisc, caption, onconfirm_misc_menu);
@@ -297,9 +294,9 @@ void process_settings_menu()
 	const int lineCount = 4;
 
 	StandardOrToggleMenuDef lines[lineCount] = {
-		{ "Player Blips", &featurePlayerBlips, &featurePlayerBlipsUpdated, true },
-		{ "Player Head Display", &featurePlayerHeadDisplay, &featurePlayerHeadDisplayUpdated, true },
-		{ "Player Blip Cone (Police FOV)", &featurePlayerBlipCone, &featurePlayerBlipConeUpdated, true },
+		{ "Player Blips", &featurePlayerBlips, NULL, true },
+		{ "Player Head Display", &featurePlayerHeadDisplay, NULL, true },
+		{ "Player Blip Cone (Police FOV)", &featurePlayerBlipCone, NULL, true },
 		{ "Player Notifications", &featurePlayerNotifications, NULL, true }
 	};
 
@@ -352,10 +349,6 @@ bool onconfirm_playerteleport_menu(MenuItem<int> choice)
 bool onconfirm_animation_menu(MenuItem<int> choice)
 {
 	Ped playerPed = PLAYER::PLAYER_PED_ID();
-
-	PED::SET_PED_CAN_PLAY_AMBIENT_ANIMS(playerPed, true);
-	PED::SET_PED_CAN_PLAY_AMBIENT_BASE_ANIMS(playerPed, true);
-	PED::SET_PED_CAN_PLAY_GESTURE_ANIMS(playerPed, true);
 
 	char* dict, * anim;
 
@@ -436,6 +429,7 @@ bool onconfirm_animation_menu(MenuItem<int> choice)
 	while (!STREAMING::HAS_ANIM_DICT_LOADED(dict))
 		WAIT(0);
 	AI::TASK_PLAY_ANIM(playerPed, dict, anim, 1, -1, -1, 48, 0, 0, 0, 0);
+	STREAMING::REMOVE_ANIM_DICT(dict);
 
 	return false;
 }
@@ -479,6 +473,7 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 		else
 			show_notification("Not in a vehicle.");
 		break;
+
 	case 1:
 		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh))
 		{
@@ -490,6 +485,7 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 		else
 			show_notification("Owned vehicle not found.");
 		break;
+
 	case 2:
 		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh))
 		{
@@ -521,6 +517,7 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 		else
 			show_notification("Owned vehicle not found.");
 		break;
+
 	case 3:
 		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh))
 		{
@@ -541,6 +538,7 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 		else
 			show_notification("Owned vehicle not found.");
 		break;
+
 	case 4:
 		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh))
 		{
@@ -601,8 +599,9 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 
 bool onconfirm_settings_menu(MenuItem<int> choice)
 {
-	if (featurePlayerBlipsUpdated)
+	switch (activeLineIndexSettings)
 	{
+	case 0:
 		if (featurePlayerBlips)
 		{
 			for (int i = 0; i < MAX_PLAYERS; i++)
@@ -627,11 +626,8 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 					UI::REMOVE_BLIP(&playerdb[i].blip);
 			}
 		}
-		featurePlayerBlipsUpdated = false;
-	}
 
-	if (featurePlayerHeadDisplayUpdated)
-	{
+	case 1:
 		if (featurePlayerHeadDisplay)
 		{
 			for (int i = 0; i < MAX_PLAYERS; i++)
@@ -644,24 +640,23 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 				if (playerdb[i].name != "" && UI::_0x4E929E7A5796FD26(playerdb[i].head))
 					UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
 		}
-		featurePlayerHeadDisplayUpdated = false;
-	}
 
-	if (featurePlayerBlipConeUpdated)
-	{
-		if (featurePlayerBlipCone)
+	case 2:
+		if (featurePlayerBlips)
 		{
-			for (int i = 0; i < MAX_PLAYERS; i++)
-				if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
-					UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
+			if (featurePlayerBlipCone)
+			{
+				for (int i = 0; i < MAX_PLAYERS; i++)
+					if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
+						UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
+			}
+			else
+			{
+				for (int i = 0; i < MAX_PLAYERS; i++)
+					if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
+						UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 0);
+			}
 		}
-		else
-		{
-			for (int i = 0; i < MAX_PLAYERS; i++)
-				if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
-					UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 0);
-		}
-		featurePlayerBlipConeUpdated = false;
 	}
 	return false;
 }
@@ -680,16 +675,20 @@ bool onconfirm_main_menu(MenuItem<int> choice)
 	case 0:
 		process_player_menu(onconfirm_playerteleport_menu, 1);
 		break;
+
 	case 1:
 		process_anim_menu();
 		break;
+
 	case 2:
 		process_settings_menu();
 		break;
+
 	case 3:
 		show_notification("Options in this menu are not guaranteed to work and may cause crashes");
 		process_misc_menu();
 		break;
+
 	case 4:
 		show_notification("Enhanced FiveM Trainer v" TRAINER_VERSION);
 		show_notification("by ~r~<C>5-H</C> ~s~(fb.me/TheDroidGeek)");
@@ -734,7 +733,7 @@ void main()
 	featurePlayerHeadDisplay = config->get_trainer_config()->setting_player_head_display;
 	featurePlayerBlipCone = config->get_trainer_config()->setting_player_blip_cone;
 	featurePlayerNotifications = config->get_trainer_config()->setting_player_notifications;
-	featureVoiceChatSpeaker = config->get_trainer_config()->setting_show_voice_chat_speaker;
+	featureShowVoiceChatSpeaker = config->get_trainer_config()->setting_show_voice_chat_speaker;
 
 	while (true)
 	{
@@ -753,7 +752,6 @@ void main()
 
 void ScriptMain()
 {
-	srand(GetTickCount());
 	read_config_file();
 	main();
 }
