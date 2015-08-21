@@ -274,16 +274,14 @@ void process_vehicle_menu()
 {
 	std::string caption = "VEHICLE MANAGEMENT";
 
-	const int lineCount = 7;
+	const int lineCount = 5;
 
 	StandardOrToggleMenuDef lines[lineCount] = {
 		{ "Set Current Vehicle As Owned", NULL, NULL, true },
 		{ "Clear Owned Vehicle", NULL, NULL, true },
 		{ "Lock Owned Vehicle", NULL, NULL, true },
 		{ "Unlock Owned Vehicle", NULL, NULL, true },
-		{ "Kick Owned Vehicle's Current Driver", NULL, NULL, true },
-		{ "Retrieve Owned Vehicle", NULL, NULL, true },
-		{ "Explode Owned Vehicle", NULL, NULL, true }
+		{ "Attempt To Retrieve Owned Vehicle", NULL, NULL, true }
 	};
 
 	draw_menu_from_struct_def(lines, lineCount, &activeLineIndexVeh, caption, onconfirm_vehicle_menu);
@@ -550,75 +548,48 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 			if (ENTITY::DOES_ENTITY_EXIST(driver)) {
 				if (driver == playerPed)
 					show_notification("Really now?");
-				else {
-					AI::CLEAR_PED_TASKS_IMMEDIATELY(driver);
-					show_notification("Your vehicle's driver was kicked.");
+				else
+				{
+					int lastSeat = VEHICLE::GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(ownedveh) - 1;
+					bool emptySeatFound = false;
+					for (int i = 0; i <= lastSeat; i++)
+					{
+						if (VEHICLE::IS_VEHICLE_SEAT_FREE(ownedveh, i))
+						{
+							emptySeatFound = true;
+							AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPed);
+							AI::TASK_WARP_PED_INTO_VEHICLE(playerPed, ownedveh, i);
+							show_notification("Vehicle driver seat full, warping to passenger seat.");
+							break;
+						}
+					}
+					if (!emptySeatFound)
+					{
+						Entity us = playerPed;
+						Vector3 vpos = ENTITY::GET_ENTITY_COORDS(ownedveh, 0);
+						vpos.z += 3.0;
+
+						if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, 0))
+						{
+							Vehicle v = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+							if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(v, -1) == playerPed)
+								us = v;
+						}
+						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(us, vpos.x, vpos.y, vpos.z, 0, 0, 1);
+
+						show_notification("Could not retrieve vehicle.");
+					}
 				}
 			}
 			else
-				show_notification("No driver was found.");
-		}
-		else
-			show_notification("Owned vehicle not found.");
-		break;
-	case 5:
-		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh)) {
-			Ped driver = VEHICLE::GET_PED_IN_VEHICLE_SEAT(ownedveh, -1);
-			if (ENTITY::DOES_ENTITY_EXIST(driver)) {
-				if (driver == playerPed) {
-					show_notification("You are already driving your damn vehicle.");
-					return false;
-				}
-				AI::CLEAR_PED_TASKS_IMMEDIATELY(driver);
-			}
-			Vector3 mypos = ENTITY::GET_ENTITY_COORDS(playerPed, 0);
-			AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPed);
-			int tick = 0;
-			while (tick < 200 && !PED::IS_PED_IN_ANY_VEHICLE(playerPed, 0)) {
+			{
+				Vector3 mypos = ENTITY::GET_ENTITY_COORDS(playerPed, 0);
+				AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPed);
 				AI::TASK_WARP_PED_INTO_VEHICLE(playerPed, ownedveh, -1);
-				WAIT(0);
-				tick++;
+				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ownedveh, mypos.x, mypos.y, mypos.z, 0, 0, 1);
+				VEHICLE::SET_VEHICLE_FIXED(ownedveh);
+				show_notification("Your vehicle was retrieved and fixed, you're welcome.");
 			}
-			if (tick == 200)
-				show_notification("DEBUG: Failed to warp to vehicle.");
-			NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(ownedveh);
-			tick = 0;
-			while (tick < 200 && !NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(ownedveh)) {
-				WAIT(0);
-				tick++;
-			}
-			if (tick == 200)
-				show_notification("DEBUG: Failed to obtain control of entity.");
-			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(ownedveh, mypos.x, mypos.y, mypos.z, 0, 0, 1);
-			VEHICLE::SET_VEHICLE_FIXED(ownedveh);
-			show_notification("Your vehicle was retrieved and fixed, you're welcome.");
-		}
-		else
-			show_notification("Owned vehicle not found.");
-		break;
-	case 6:
-		if (ownedveh != NULL && ENTITY::DOES_ENTITY_EXIST(ownedveh))
-		{
-			Ped driver = VEHICLE::GET_PED_IN_VEHICLE_SEAT(ownedveh, -1);
-			if (ENTITY::DOES_ENTITY_EXIST(driver)) {
-				if (driver == playerPed) {
-					show_notification("You are driving the damn vehicle.");
-					return false;
-				}
-				AI::CLEAR_PED_TASKS_IMMEDIATELY(driver);
-			}
-			NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(ownedveh);
-			int tick = 0;
-			while (tick < 200 && !NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(ownedveh)) {
-				WAIT(0);
-				tick++;
-			}
-			if (tick == 200)
-				show_notification("DEBUG: Failed to obtain control of entity.");
-			ENTITY::SET_ENTITY_INVINCIBLE(ownedveh, 0);
-			NETWORK::NETWORK_EXPLODE_VEHICLE(ownedveh, 1, 0, 0);
-			ownedveh = NULL;
-			show_notification("Exploded previously owned vehicle.");
 		}
 		else
 			show_notification("Owned vehicle not found.");
