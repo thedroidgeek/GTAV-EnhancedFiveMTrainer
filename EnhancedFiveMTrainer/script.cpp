@@ -166,7 +166,9 @@ void updateStuff()
 						case 15: UI::SET_BLIP_SPRITE(playerdb[i].blip, 422); break; //Helicopter
 						case 16: UI::SET_BLIP_SPRITE(playerdb[i].blip, 423); break; //Airplane
 						case 19: UI::SET_BLIP_SPRITE(playerdb[i].blip, 421); break; //Military
+						default: UI::SET_BLIP_SPRITE(playerdb[i].blip, 1); break;
 						}
+						UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i); // Blip name sometimes gets overriden by sprite name
 					}
 				}
 			}
