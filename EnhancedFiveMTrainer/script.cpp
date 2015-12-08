@@ -301,7 +301,7 @@ void process_settings_menu()
 {
 	std::string caption = "TRAINER SETTINGS";
 
-	const int lineCount = 4;
+	const int lineCount = 3;
 
 	StandardOrToggleMenuDef lines[lineCount] = {
 		{ "Player Blips", &featurePlayerBlips, NULL, true },
