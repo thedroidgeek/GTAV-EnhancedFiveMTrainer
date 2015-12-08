@@ -141,7 +141,7 @@ inline void draw_menu_header_line(std::string caption, float lineWidth, float li
 
 	float text_scale = rescaleText ? 0.60 : 0.35;
 
-	int font = 2;
+	int font = 4;
 	bool outline = false;
 	bool dropShadow = false;
 
@@ -150,10 +150,10 @@ inline void draw_menu_header_line(std::string caption, float lineWidth, float li
 
 	float lineWidthScaled = lineWidth / (float)screen_w; // line width
 	float lineTopScaled = lineTop / (float)screen_h; // line top offset
-	float textLeftScaled = textLeft / (float)screen_w; // text left offset
+	float textLeftScaled = 1.0f - (textLeft / (float)screen_w) - lineWidthScaled; // text left offset
 	float lineHeightScaled = lineHeight / (float)screen_h; // line height
 
-	float lineLeftScaled = lineLeft / (float)screen_w;
+	float lineLeftScaled = 1.0f - (lineLeft / (float)screen_w) - lineWidthScaled;
 
 	float textHeightScaled = TEXT_HEIGHT_TITLE / (float)screen_h;
 
@@ -180,7 +180,9 @@ inline void draw_menu_header_line(std::string caption, float lineWidth, float li
 	UI::_ADD_TEXT_COMPONENT_STRING((LPSTR)caption.c_str());
 
 	float textY = lineTopScaled + (0.5f * (lineHeightScaled - textHeightScaled));
-	float leftMarginScaled = textLeftScaled - lineLeftScaled;
+
+	float leftMarginScaled = lineLeftScaled - textLeftScaled;
+	float rightMarginScaled = 15.0f / (float)screen_w;
 
 	UI::_DRAW_TEXT(textLeftScaled, textY);
 
@@ -216,12 +218,12 @@ inline void draw_menu_header_line(std::string caption, float lineWidth, float li
 
 
 		UI::SET_TEXT_EDGE(0, 0, 0, 0, 0);
-		UI::SET_TEXT_WRAP(0.0f, lineLeftScaled + lineWidthScaled - leftMarginScaled);
+		UI::SET_TEXT_WRAP(0.0f, lineLeftScaled + lineWidthScaled - rightMarginScaled);
 		UI::_SET_TEXT_ENTRY("STRING");
 
 		auto ssStr = ss.str();
 		UI::_ADD_TEXT_COMPONENT_STRING((char *)ssStr.c_str());
-		UI::_DRAW_TEXT(0, textY);
+		UI::_DRAW_TEXT(lineLeftScaled + lineWidthScaled - rightMarginScaled, textY);
 	}
 }
 
@@ -260,15 +262,16 @@ void draw_menu_item_line(MenuItem<T> *item, float lineWidth, float lineHeight, f
 	int screen_w, screen_h;
 	GRAPHICS::GET_SCREEN_RESOLUTION(&screen_w, &screen_h);
 
-	textLeft += lineLeft;
+	textLeft -= lineLeft;
 
 	float lineWidthScaled = lineWidth / (float)screen_w; // line width
 	float lineTopScaled = lineTop / (float)screen_h; // line top offset
-	float textLeftScaled = textLeft / (float)screen_w; // text left offset
+	float textLeftScaled = 1.0f - (textLeft / (float)screen_w) - lineWidthScaled; // text left offset
 	float lineHeightScaled = lineHeight / (float)screen_h; // line height
 
-	float lineLeftScaled = lineLeft / (float)screen_w;
-	float leftMarginScaled = textLeftScaled - lineLeftScaled;
+	float lineLeftScaled = 1.0f - (lineLeft / (float)screen_w) - lineWidthScaled;
+
+	float leftMarginScaled = lineLeftScaled - textLeftScaled;
 
 	float textHeightScaled = TEXT_HEIGHT_NORMAL / (float)screen_h;
 	float rightMarginScaled = 30.0f / (float)screen_w;
@@ -350,9 +353,9 @@ void draw_menu_item_line(MenuItem<T> *item, float lineWidth, float lineHeight, f
 		UI::SET_TEXT_COLOUR(text_col[0], text_col[1], text_col[2], text_col[3]);
 		UI::SET_TEXT_CENTRE(0);
 
-		/*
 		UI::SET_TEXT_OUTLINE();
 
+		/*
 		if (dropShadow)
 		{
 			UI::SET_TEXT_DROPSHADOW(5, 0, 78, 255, 255);
@@ -362,12 +365,12 @@ void draw_menu_item_line(MenuItem<T> *item, float lineWidth, float lineHeight, f
 		UI::SET_TEXT_EDGE(1, 255, 215, 0, 255);
 
 		UI::SET_TEXT_COLOUR(text_col[0], text_col[1], text_col[2], text_col[3]);
-		UI::SET_TEXT_RIGHT_JUSTIFY(1);
+		UI::SET_TEXT_CENTRE(1);
 		UI::SET_TEXT_WRAP(0.0f, lineLeftScaled + lineWidthScaled - leftMarginScaled);
 		UI::_SET_TEXT_ENTRY("STRING");
 		UI::_ADD_TEXT_COMPONENT_STRING(">>");
-		float textY = lineTopScaled + (0.5f * (lineHeightScaled - (TEXT_HEIGHT_NONLEAF/(float)screen_h)));
-		UI::_DRAW_TEXT(0, textY);
+		float textY = lineTopScaled + (0.5f * (lineHeightScaled - (TEXT_HEIGHT_NONLEAF / (float)screen_h)));
+		UI::_DRAW_TEXT(lineLeftScaled + lineWidthScaled - rightMarginScaled, textY);
 	}
 }
 
@@ -487,10 +490,10 @@ bool draw_generic_menu(std::vector<MenuItem<T>*> items, int *menuSelectionPtr, s
 		{
 			draw_menu_header_line(headerText,
 				350.0f,//line W
-				50.0f,//line H
+				45.0f,//line H
 				15.0f,//line T
-				0.0f,//line L
-				15.0f,//text X offset
+				10.0f,//line L
+				0.0f,//text X offset
 				false,
 				true,
 				(currentLine + 1),
@@ -499,13 +502,13 @@ bool draw_generic_menu(std::vector<MenuItem<T>*> items, int *menuSelectionPtr, s
 
 			for (int i = 0; i < itemsOnThisLine; i++)
 			{
-				float lineSpacingY = 10.0f;
+				float lineSpacingY = 5.0f;
 
-				float lineWidth = 350.0f;
+				float lineWidth = 340.0f;
 				float lineHeight = 35.0f;
 
-				float lineTop = 75.0 + (i * (lineHeight + lineSpacingY));
-				float lineLeft = 35.0f;
+				float lineTop = 65.0 + (i * (lineHeight + lineSpacingY));
+				float lineLeft = 10.0f;
 				float textOffset = 10.0f;
 
 				draw_menu_item_line(items[lineStartPosition + i], lineWidth, lineHeight, lineTop, lineLeft, textOffset, i == positionOnThisLine, false);

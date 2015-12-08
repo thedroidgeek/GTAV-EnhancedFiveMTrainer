@@ -711,7 +711,7 @@ bool onconfirm_main_menu(MenuItem<int> choice)
 
 void process_main_menu()
 {
-	std::string caption = "Enhanced FiveM Trainer";
+	std::string caption = "Enhanced FiveM Trainer ~r~" TRAINER_VERSION;
 
 	std::vector<std::string> TOP_OPTIONS = {
 		"Teleport To Player",
