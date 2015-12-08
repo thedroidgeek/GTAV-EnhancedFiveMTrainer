@@ -206,6 +206,11 @@ void updateStuff()
 					if (featurePlayerBlips) {
 						Vehicle v = PED::GET_VEHICLE_PED_IS_IN(playerdb[i].ped, false);
 						switch (VEHICLE::GET_VEHICLE_CLASS(v)) {
+						case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+						case 9: case 10: case 11: case 12: case 17: case 18:
+						case 20: UI::SET_BLIP_SPRITE(playerdb[i].blip, 225); break; //Car
+						case 8:
+						case 13: UI::SET_BLIP_SPRITE(playerdb[i].blip, 226); break; //Bike
 						case 14: UI::SET_BLIP_SPRITE(playerdb[i].blip, 410); break; //Boat
 						case 15: UI::SET_BLIP_SPRITE(playerdb[i].blip, 422); break; //Helicopter
 						case 16: UI::SET_BLIP_SPRITE(playerdb[i].blip, 423); break; //Airplane
