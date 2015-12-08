@@ -148,6 +148,10 @@ void SettingsConfig::set_param(char* function, char* value)
 		{
 			setting_show_voice_chat_speaker = result;
 		}
+		else if (strcmp(function, "show_death_cutscene") == 0)
+		{
+			setting_show_death_cutscene = result;
+		}
 	}
 };
 

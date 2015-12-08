@@ -42,7 +42,7 @@ bool ownedvehlocked = false;
 
 bool playerWasDisconnected = true;
 
-bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerNotifications, featureShowVoiceChatSpeaker;
+bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerNotifications, featureShowVoiceChatSpeaker, featureShowDeathCutscene;
 
 
 bool onconfirm_playerteleport_menu(MenuItem<int> choice);
@@ -81,6 +81,32 @@ void updateStuff()
 			}
 			if (featureShowVoiceChatSpeaker && isVoiceChatRunning)
 				update_status_text();
+
+			if (featureShowDeathCutscene && ENTITY::IS_ENTITY_DEAD(PLAYER::GET_PLAYER_PED(playerId)))
+			{
+				AUDIO::PLAY_SOUND_FRONTEND(-1, "Bed", "WastedSounds", 1);
+				GRAPHICS::_START_SCREEN_EFFECT("DeathFailOut", 0, 0);
+
+				int scaleform = GRAPHICS::REQUEST_SCALEFORM_MOVIE("MP_BIG_MESSAGE_FREEMODE");
+
+				while (!GRAPHICS::HAS_SCALEFORM_MOVIE_LOADED(scaleform))
+					WAIT(0);
+
+				GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION(scaleform, "SHOW_SHARD_WASTED_MP_MESSAGE");
+				GRAPHICS::_BEGIN_TEXT_COMPONENT("STRING");
+				UI::_ADD_TEXT_COMPONENT_ITEM_STRING("RESPAWN_W");
+				GRAPHICS::_END_TEXT_COMPONENT();
+				GRAPHICS::_POP_SCALEFORM_MOVIE_FUNCTION_VOID();
+
+				WAIT(1000);
+
+				AUDIO::PLAY_SOUND_FRONTEND(-1, "TextHit", "WastedSounds", 1);
+				while (ENTITY::IS_ENTITY_DEAD(PLAYER::GET_PLAYER_PED(playerId))) {
+					GRAPHICS::_0x0DF606929C105BE1(scaleform, 255, 255, 255, 255);
+					WAIT(0);
+				}
+				GRAPHICS::_STOP_SCREEN_EFFECT("DeathFailOut");
+			}
 
 			if (NETWORK::NETWORK_IS_PLAYER_CONNECTED(i))
 			{
@@ -264,11 +290,12 @@ void process_misc_menu()
 {
 	std::string caption = "MISCELLANEOUS";
 
-	const int lineCount = 2;
+	const int lineCount = 3;
 
 	StandardOrToggleMenuDef lines[lineCount] = {
 		{ "Basic Vehicle Management System", NULL, NULL, false },
-		{ "Show Voice Chat Speaker", &featureShowVoiceChatSpeaker, NULL, true }
+		{ "Show Voice Chat Speaker", &featureShowVoiceChatSpeaker, NULL, true },
+		{ "Show Death Cutscene", &featureShowDeathCutscene, NULL, true },
 	};
 
 	draw_menu_from_struct_def(lines, lineCount, &activeLineIndexMisc, caption, onconfirm_misc_menu);
@@ -725,6 +752,7 @@ void main()
 	featurePlayerHeadDisplay = config->get_trainer_config()->setting_player_head_display;
 	featurePlayerNotifications = config->get_trainer_config()->setting_player_notifications;
 	featureShowVoiceChatSpeaker = config->get_trainer_config()->setting_show_voice_chat_speaker;
+	featureShowDeathCutscene = config->get_trainer_config()->setting_show_death_cutscene;
 
 	while (true)
 	{
