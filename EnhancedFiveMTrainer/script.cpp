@@ -14,7 +14,7 @@
   */
 
 
-#define TRAINER_VERSION "1.6"
+#define TRAINER_VERSION "1.7"
 #define MAX_PLAYERS 32
 
 #include "io.h"
@@ -787,7 +787,7 @@ bool onconfirm_main_menu(MenuItem<int> choice)
 		break;
 
 	case 4:
-		show_notification("Enhanced FiveM Trainer v" TRAINER_VERSION);
+		show_notification("Enhanced FiveM Trainer ~r~" TRAINER_VERSION);
 		show_notification("by ~r~<C>5-H</C> ~s~(fb.me/TheDroidGeek)");
 		show_notification("Credits goes to~n~~y~Enhanced Native Trainer~n~~s~for the trainer menu code.");
 		break;
