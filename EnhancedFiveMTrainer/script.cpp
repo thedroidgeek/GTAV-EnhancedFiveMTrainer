@@ -82,31 +82,56 @@ void updateStuff()
 			if (featureShowVoiceChatSpeaker && isVoiceChatRunning)
 				update_status_text();
 
-			if (featureShowDeathCutscene && ENTITY::IS_ENTITY_DEAD(PLAYER::GET_PLAYER_PED(playerId)))
+			if (featurePlayerNotifications || featureShowDeathCutscene)
 			{
-				AUDIO::PLAY_SOUND_FRONTEND(-1, "Bed", "WastedSounds", 1);
-				GRAPHICS::_START_SCREEN_EFFECT("DeathFailOut", 0, 0);
+				Ped playerPed = PLAYER::GET_PLAYER_PED(playerId);
+				if (ENTITY::DOES_ENTITY_EXIST(playerPed) && ENTITY::IS_ENTITY_DEAD(playerPed))
+				{
+					if (featurePlayerNotifications)
+					{
+						std::string msg = "You died.";
+						Entity e = PED::_GET_PED_KILLER(playerPed);
+						if (ENTITY::DOES_ENTITY_EXIST(e) && PED::IS_PED_A_PLAYER(e)) {
+							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _GET_PED_PLAYER
+							std::string kname = PLAYER::GET_PLAYER_NAME(killer);
+							if (kname != "") {
+								if (kname == PLAYER::GET_PLAYER_NAME(playerId))
+									msg = "You commited suicide.";
+								else
+									msg = "<C>" + kname + "</C> murdered you.";
+							}
+						}
+						show_notification((char*)msg.c_str());
+					}
 
-				int scaleform = GRAPHICS::REQUEST_SCALEFORM_MOVIE("MP_BIG_MESSAGE_FREEMODE");
+					if (featureShowDeathCutscene)
+					{
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "Bed", "WastedSounds", 1);
+						GRAPHICS::_START_SCREEN_EFFECT("DeathFailOut", 0, 0);
 
-				while (!GRAPHICS::HAS_SCALEFORM_MOVIE_LOADED(scaleform))
-					WAIT(0);
+						int scaleform = GRAPHICS::REQUEST_SCALEFORM_MOVIE("MP_BIG_MESSAGE_FREEMODE");
 
-				GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION(scaleform, "SHOW_SHARD_WASTED_MP_MESSAGE");
-				GRAPHICS::_BEGIN_TEXT_COMPONENT("STRING");
-				UI::_ADD_TEXT_COMPONENT_ITEM_STRING("RESPAWN_W");
-				GRAPHICS::_END_TEXT_COMPONENT();
-				GRAPHICS::_POP_SCALEFORM_MOVIE_FUNCTION_VOID();
+						while (!GRAPHICS::HAS_SCALEFORM_MOVIE_LOADED(scaleform))
+							WAIT(0);
 
-				WAIT(1000);
+						GRAPHICS::_PUSH_SCALEFORM_MOVIE_FUNCTION(scaleform, "SHOW_SHARD_WASTED_MP_MESSAGE");
+						GRAPHICS::_BEGIN_TEXT_COMPONENT("STRING");
+						UI::_ADD_TEXT_COMPONENT_ITEM_STRING("RESPAWN_W");
+						GRAPHICS::_END_TEXT_COMPONENT();
+						GRAPHICS::_POP_SCALEFORM_MOVIE_FUNCTION_VOID();
 
-				AUDIO::PLAY_SOUND_FRONTEND(-1, "TextHit", "WastedSounds", 1);
-				while (ENTITY::IS_ENTITY_DEAD(PLAYER::GET_PLAYER_PED(playerId))) {
-					GRAPHICS::_0x0DF606929C105BE1(scaleform, 255, 255, 255, 255);
-					WAIT(0);
+						WAIT(1000);
+
+						AUDIO::PLAY_SOUND_FRONTEND(-1, "TextHit", "WastedSounds", 1);
+						while (ENTITY::IS_ENTITY_DEAD(PLAYER::GET_PLAYER_PED(playerId))) {
+							GRAPHICS::_0x0DF606929C105BE1(scaleform, 255, 255, 255, 255);
+							WAIT(0);
+						}
+						GRAPHICS::_STOP_SCREEN_EFFECT("DeathFailOut");
+					}
 				}
-				GRAPHICS::_STOP_SCREEN_EFFECT("DeathFailOut");
 			}
+
 
 			if (NETWORK::NETWORK_IS_PLAYER_CONNECTED(i))
 			{
@@ -123,6 +148,25 @@ void updateStuff()
 				{
 					Ped pedId = PLAYER::GET_PLAYER_PED(i);
 					unsigned int headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
+
+					if (featurePlayerNotifications && ENTITY::DOES_ENTITY_EXIST(pedId) && ENTITY::IS_ENTITY_DEAD(pedId))
+					{
+						std::string msg = "<C>" + name + "</C> died.";;
+						Entity e = PED::_GET_PED_KILLER(pedId);
+						if (ENTITY::DOES_ENTITY_EXIST(e) && PED::IS_PED_A_PLAYER(e)) {
+							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _GET_PED_PLAYER
+							std::string kname = PLAYER::GET_PLAYER_NAME(killer);
+							if (kname != "") {
+								if (kname == name)
+									msg = "<C>" + name + "</C> commited suicide.";
+								else if (kname == PLAYER::GET_PLAYER_NAME(playerId))
+									msg = "You killed <C>" + name + "</C>";
+								else
+									msg = "<C>" + kname + "</C> killed <C>" + name + "</C>";
+							}
+						}
+						show_notification((char*)msg.c_str());
+					}
 
 					if (UI::_0x4E929E7A5796FD26(headDisplayId))
 					{
