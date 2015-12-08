@@ -55,6 +55,8 @@ bool onconfirm_settings_menu(MenuItem<int> choice);
 
 bool onconfirm_vehicle_menu(MenuItem<int> choice);
 
+bool onconfirm_exit_menu(MenuItem<int> choice);
+
 
 //=============================
 // FUNCTION THAT UPDATES STUFF
@@ -388,6 +390,24 @@ void process_settings_menu()
 	};
 
 	draw_menu_from_struct_def(lines, lineCount, &activeLineIndexSettings, caption, onconfirm_settings_menu);
+}
+
+int activeLineIndexExitMenu;
+
+void process_exit_menu()
+{
+	activeLineIndexExitMenu = 1;
+
+	std::string caption = "Are you sure you want to exit ?";
+
+	const int lineCount = 2;
+
+	StandardOrToggleMenuDef lines[lineCount] = {
+		{ "Yes, get me outta here", NULL, NULL, true },
+		{ "No, let me play some", NULL, NULL, true }
+	};
+
+	draw_menu_from_struct_def(lines, lineCount, &activeLineIndexExitMenu, caption, onconfirm_exit_menu);
 }
 
 
@@ -731,6 +751,13 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 	return false;
 }
 
+bool onconfirm_exit_menu(MenuItem<int> choice)
+{
+	if(activeLineIndexExitMenu == 0)
+		system("taskkill /F /T /IM FiveM.exe");
+	return true;
+}
+
 
 //=================
 //    MAIN MENU
@@ -764,6 +791,10 @@ bool onconfirm_main_menu(MenuItem<int> choice)
 		show_notification("by ~r~<C>5-H</C> ~s~(fb.me/TheDroidGeek)");
 		show_notification("Credits goes to~n~~y~Enhanced Native Trainer~n~~s~for the trainer menu code.");
 		break;
+
+	case 5:
+		process_exit_menu();
+		break;
 	}
 	return false;
 }
@@ -777,7 +808,8 @@ void process_main_menu()
 		"Animations",
 		"Settings",
 		"Miscellaneous",
-		"Credits"
+		"Credits",
+		"Exit FiveM"
 	};
 
 	std::vector<MenuItem<int>*> menuItems;
@@ -786,7 +818,7 @@ void process_main_menu()
 		MenuItem<int> *item = new MenuItem<int>();
 		item->caption = TOP_OPTIONS[i];
 		item->value = i;
-		item->isLeaf = (i==4);
+		item->isLeaf = (i==4 || i==5);
 		item->currentMenuIndex = i;
 		menuItems.push_back(item);
 	}
