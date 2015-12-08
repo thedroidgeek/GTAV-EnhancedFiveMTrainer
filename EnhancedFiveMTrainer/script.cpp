@@ -42,7 +42,7 @@ bool ownedvehlocked = false;
 
 bool playerWasDisconnected = true;
 
-bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerBlipCone, featurePlayerNotifications, featureShowVoiceChatSpeaker;
+bool featurePlayerBlips, featurePlayerHeadDisplay, featurePlayerNotifications, featureShowVoiceChatSpeaker;
 
 
 bool onconfirm_playerteleport_menu(MenuItem<int> choice);
@@ -113,10 +113,9 @@ void updateStuff()
 							playerdb[i].blip = UI::ADD_BLIP_FOR_ENTITY(pedId);
 							UI::SET_BLIP_COLOUR(playerdb[i].blip, 0);
 							UI::SET_BLIP_SCALE(playerdb[i].blip, 0.8);
-							if (featurePlayerBlipCone)
-								UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
 							UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
 							UI::SET_BLIP_CATEGORY(playerdb[i].blip, 7);
+							UI::_0x5FBCA48327B914DF(playerdb[i].blip, 1);
 							
 						}
 
@@ -307,7 +306,6 @@ void process_settings_menu()
 	StandardOrToggleMenuDef lines[lineCount] = {
 		{ "Player Blips", &featurePlayerBlips, NULL, true },
 		{ "Player Head Display", &featurePlayerHeadDisplay, NULL, true },
-		{ "Player Blip Cone (Police FOV)", &featurePlayerBlipCone, NULL, true },
 		{ "Player Notifications", &featurePlayerNotifications, NULL, true }
 	};
 
@@ -622,10 +620,9 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 					playerdb[i].blip = UI::ADD_BLIP_FOR_ENTITY((playerdb[i].ped));
 					UI::SET_BLIP_COLOUR(playerdb[i].blip, 0);
 					UI::SET_BLIP_SCALE(playerdb[i].blip, 0.8);
-					if (featurePlayerBlipCone)
-						UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
 					UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
 					UI::SET_BLIP_CATEGORY(playerdb[i].blip, 7);
+					UI::_0x5FBCA48327B914DF(playerdb[i].blip, 1);
 				}
 			}
 		}
@@ -652,22 +649,6 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 					UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
 		}
 
-	case 2:
-		if (featurePlayerBlips)
-		{
-			if (featurePlayerBlipCone)
-			{
-				for (int i = 0; i < MAX_PLAYERS; i++)
-					if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
-						UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
-			}
-			else
-			{
-				for (int i = 0; i < MAX_PLAYERS; i++)
-					if (playerdb[i].name != "" && UI::DOES_BLIP_EXIST(playerdb[i].blip))
-						UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 0);
-			}
-		}
 	}
 	return false;
 }
@@ -742,7 +723,6 @@ void main()
 
 	featurePlayerBlips = config->get_trainer_config()->setting_player_blips;
 	featurePlayerHeadDisplay = config->get_trainer_config()->setting_player_head_display;
-	featurePlayerBlipCone = config->get_trainer_config()->setting_player_blip_cone;
 	featurePlayerNotifications = config->get_trainer_config()->setting_player_notifications;
 	featureShowVoiceChatSpeaker = config->get_trainer_config()->setting_show_voice_chat_speaker;
 

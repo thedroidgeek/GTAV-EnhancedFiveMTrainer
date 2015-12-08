@@ -27,7 +27,6 @@ public:
 
 	bool setting_player_blips = 1;
 	bool setting_player_head_display = 1;
-	bool setting_player_blip_cone = 0;
 	bool setting_player_notifications = 1;
 	bool setting_show_voice_chat_speaker = 0;
 

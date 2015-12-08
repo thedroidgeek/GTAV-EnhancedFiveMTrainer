@@ -140,10 +140,6 @@ void SettingsConfig::set_param(char* function, char* value)
 		{
 			setting_player_head_display = result;
 		}
-		else if (strcmp(function, "player_blip_cone") == 0)
-		{
-			setting_player_blip_cone = result;
-		}
 		else if (strcmp(function, "player_notifications") == 0)
 		{
 			setting_player_notifications = result;
