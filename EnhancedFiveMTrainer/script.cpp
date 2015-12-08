@@ -117,6 +117,7 @@ void updateStuff()
 								UI::SET_BLIP_SHOW_CONE(playerdb[i].blip, 1);
 							UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
 							UI::SET_BLIP_CATEGORY(playerdb[i].blip, 7);
+							
 						}
 
 						if (playerWasDisconnected || playerdb[i].name != name) // Making sure the player wasn't already here and only changed his ped (ex. skin change)
@@ -131,6 +132,16 @@ void updateStuff()
 							playerdb[i].name = name;
 						}
 						playerdb[i].ped = pedId;
+					}
+
+					if (featurePlayerBlips) {
+						Vehicle v = PED::GET_VEHICLE_PED_IS_IN(playerdb[i].ped, false);
+						switch (VEHICLE::GET_VEHICLE_CLASS(v)) {
+						case 14: UI::SET_BLIP_SPRITE(playerdb[i].blip, 410); break; //Boat
+						case 15: UI::SET_BLIP_SPRITE(playerdb[i].blip, 422); break; //Helicopter
+						case 16: UI::SET_BLIP_SPRITE(playerdb[i].blip, 423); break; //Airplane
+						case 19: UI::SET_BLIP_SPRITE(playerdb[i].blip, 421); break; //Military
+						}
 					}
 				}
 			}
