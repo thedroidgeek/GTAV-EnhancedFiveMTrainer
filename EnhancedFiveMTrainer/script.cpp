@@ -207,18 +207,25 @@ void updateStuff()
 
 					if (featurePlayerBlips) {
 						Vehicle v = PED::GET_VEHICLE_PED_IS_IN(playerdb[i].ped, false);
-						switch (VEHICLE::GET_VEHICLE_CLASS(v)) {
-						case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-						case 9: case 10: case 11: case 12: case 17: case 18:
-						case 20: UI::SET_BLIP_SPRITE(playerdb[i].blip, 225); break; //Car
-						case 8:
-						case 13: UI::SET_BLIP_SPRITE(playerdb[i].blip, 226); break; //Bike
-						case 14: UI::SET_BLIP_SPRITE(playerdb[i].blip, 410); break; //Boat
-						case 15: UI::SET_BLIP_SPRITE(playerdb[i].blip, 422); break; //Helicopter
-						case 16: UI::SET_BLIP_SPRITE(playerdb[i].blip, 423); break; //Airplane
-						case 19: UI::SET_BLIP_SPRITE(playerdb[i].blip, 421); break; //Military
-						default: UI::SET_BLIP_SPRITE(playerdb[i].blip, 1); break;
-						}
+						int vclass = VEHICLE::GET_VEHICLE_CLASS(v);
+						int sprite = 1;
+
+						if ((vclass >= 1 && vclass <= 12) || vclass == 17 || vclass == 18 || vclass == 20)
+							sprite = 225; //Car
+						else if (vclass == 8 || vclass == 13)
+							sprite = 226; //Bike
+						else if (vclass == 14)
+							sprite = 410; //Boat
+						else if (vclass == 15)
+							sprite = 422; //Helicopter
+						else if (vclass == 16)
+							sprite = 423; //Airplane
+						else if (vclass == 19)
+							sprite = 421; //Military
+
+						if (UI::GET_BLIP_SPRITE(playerdb[i].blip) != sprite)
+							UI::SET_BLIP_SPRITE(playerdb[i].blip, sprite);
+
 						UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i); // Blip name sometimes gets overriden by sprite name
 					}
 				}
