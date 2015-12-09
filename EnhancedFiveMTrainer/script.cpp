@@ -267,8 +267,12 @@ void updateStuff()
 
 int activeLineIndexPlayer = 0;
 
+bool shouldRefreshPlayerMenu = true;
+
 void process_player_menu(bool(*onConfirmation)(MenuItem<int> value), bool warningMsg)
 {
+	shouldRefreshPlayerMenu = false;
+
 	if (NETWORK::NETWORK_IS_SESSION_STARTED())
 	{
 		std::vector<StandardOrToggleMenuDef> lines_v;
@@ -297,7 +301,10 @@ void process_player_menu(bool(*onConfirmation)(MenuItem<int> value), bool warnin
 		if (warningMsg)
 			show_notification("Please don't abuse this feature and annoy other players.");
 
-		draw_menu_from_struct_def(&lines_v[0], lineCount, &activeLineIndexPlayer, caption, onConfirmation);
+		bool result = draw_menu_from_struct_def(&lines_v[0], lineCount, &activeLineIndexPlayer, caption, onConfirmation);
+
+		if (result)
+			shouldRefreshPlayerMenu = true;
 	}
 	else
 	{
@@ -455,8 +462,7 @@ bool onconfirm_playerteleport_menu(MenuItem<int> choice)
 		}
 	}
 
-	process_player_menu(onconfirm_playerteleport_menu, 0);
-	return true; // Returned true as onConfirmation() to close the old menu since we processed a new updated one
+	return true;
 }
 
 
@@ -778,6 +784,9 @@ bool onconfirm_main_menu(MenuItem<int> choice)
 	{
 	case 0:
 		process_player_menu(onconfirm_playerteleport_menu, 1);
+		while (shouldRefreshPlayerMenu)
+			process_player_menu(onconfirm_playerteleport_menu, 0);
+		shouldRefreshPlayerMenu = true;
 		break;
 
 	case 1:

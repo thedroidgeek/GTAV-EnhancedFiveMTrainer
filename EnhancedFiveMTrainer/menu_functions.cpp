@@ -191,7 +191,7 @@ void update_status_text()
 	}
 }
 
-void draw_menu_from_struct_def(StandardOrToggleMenuDef defs[], int lineCount, int* selectionRef, std::string caption, bool(*onConfirmation)(MenuItem<int> value))
+bool draw_menu_from_struct_def(StandardOrToggleMenuDef defs[], int lineCount, int* selectionRef, std::string caption, bool(*onConfirmation)(MenuItem<int> value))
 {
 	std::vector<MenuItem<int>*> menuItems;
 	for (int i = 0; i < lineCount; i++)
@@ -219,10 +219,10 @@ void draw_menu_from_struct_def(StandardOrToggleMenuDef defs[], int lineCount, in
 		}
 	}
 
-	draw_generic_menu<int>(menuItems, selectionRef, caption, onConfirmation, NULL, NULL);
+	return draw_generic_menu<int>(menuItems, selectionRef, caption, onConfirmation, NULL, NULL);
 }
 
-void draw_menu_from_struct_def(StringStandardOrToggleMenuDef defs[], int lineCount, int* selectionRef, std::string caption, bool(*onConfirmation)(MenuItem<std::string> value))
+bool draw_menu_from_struct_def(StringStandardOrToggleMenuDef defs[], int lineCount, int* selectionRef, std::string caption, bool(*onConfirmation)(MenuItem<std::string> value))
 {
 	std::vector<MenuItem<std::string>*> menuItems;
 	for (int i = 0; i < lineCount; i++)
@@ -250,7 +250,7 @@ void draw_menu_from_struct_def(StringStandardOrToggleMenuDef defs[], int lineCou
 		}
 	}
 
-	draw_generic_menu<std::string>(menuItems, selectionRef, caption, onConfirmation, NULL, NULL);
+	return draw_generic_menu<std::string>(menuItems, selectionRef, caption, onConfirmation, NULL, NULL);
 }
 
 
