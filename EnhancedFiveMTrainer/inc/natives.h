@@ -3330,7 +3330,7 @@ namespace UI
 	static void CLEAR_FLOATING_HELP(Any p0, BOOL p1) { invoke<Void>(0x50085246ABD3FEFA, p0, p1); } // 0x50085246ABD3FEFA 0xB181F88F
 	static void _0x6DD05E9D83EFA4C9(Any p0, Any* p1, BOOL p2, BOOL p3, Any* p4, Any p5, Any p6, Any p7, Any p8) { invoke<Void>(0x6DD05E9D83EFA4C9, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0x6DD05E9D83EFA4C9 0xC969F2D0
 	static Any _0x6E0EB3EB47C8D7AA() { return invoke<Any>(0x6E0EB3EB47C8D7AA); } // 0x6E0EB3EB47C8D7AA 0xEFD2564A
-	static Any _0xBFEFE3321A3F5015(Any p0, Any* p1, BOOL p2, BOOL p3, Any* p4, Any p5) { return invoke<Any>(0xBFEFE3321A3F5015, p0, p1, p2, p3, p4, p5); } // 0xBFEFE3321A3F5015 0xF5CD2AA4
+	static Any _0xBFEFE3321A3F5015(Any p0, char* p1, BOOL p2, BOOL p3, char* p4, Any p5) { return invoke<Any>(0xBFEFE3321A3F5015, p0, p1, p2, p3, p4, p5); } // 0xBFEFE3321A3F5015 0xF5CD2AA4
 	static void _0x31698AA80E0223F8(Any p0) { invoke<Void>(0x31698AA80E0223F8, p0); } // 0x31698AA80E0223F8 0x3D081FE4
 	static BOOL _0x4E929E7A5796FD26(Any p0) { return invoke<BOOL>(0x4E929E7A5796FD26, p0); } // 0x4E929E7A5796FD26 0x60118951
 	static BOOL ADD_TREVOR_RANDOM_MODIFIER(Any p0) { return invoke<BOOL>(0x595B5178E412E199, p0); } // 0x595B5178E412E199 0x63959059
@@ -3341,7 +3341,7 @@ namespace UI
 	static void _0x3158C77A7E888AB4(Any p0, Any p1) { invoke<Void>(0x3158C77A7E888AB4, p0, p1); } // 0x3158C77A7E888AB4 0x5777EC77
 	static void _0xD48FE545CD46F857(Any p0, Any p1, Any p2) { invoke<Void>(0xD48FE545CD46F857, p0, p1, p2); } // 0xD48FE545CD46F857 0xF4418611
 	static void _0xCF228E2AA03099C3(Any p0, Any p1) { invoke<Void>(0xCF228E2AA03099C3, p0, p1); } // 0xCF228E2AA03099C3 0x0EBB003F
-	static void _0xDEA2B8283BAA3944(Any p0, Any* p1) { invoke<Void>(0xDEA2B8283BAA3944, p0, p1); } // 0xDEA2B8283BAA3944 0x627A559B
+	static void _0xDEA2B8283BAA3944(Any p0, char* p1) { invoke<Void>(0xDEA2B8283BAA3944, p0, p1); } // 0xDEA2B8283BAA3944 0x627A559B
 	static BOOL _0xEB709A36958ABE0D(Any p0) { return invoke<BOOL>(0xEB709A36958ABE0D, p0); } // 0xEB709A36958ABE0D 0xF11414C4
 	static void _0x7B7723747CCB55B6(Any p0, Any* p1) { invoke<Void>(0x7B7723747CCB55B6, p0, p1); } // 0x7B7723747CCB55B6 0x939218AB
 	static Any _0x01A358D9128B7A86() { return invoke<Any>(0x01A358D9128B7A86); } // 0x01A358D9128B7A86 0xAB5B7C18
@@ -3711,7 +3711,7 @@ namespace GRAPHICS
 	static void SET_SCALEFORM_MOVIE_AS_NO_LONGER_NEEDED(Any* scaleformPtr) { invoke<Void>(0x1D132D614DD86811, scaleformPtr); } // 0x1D132D614DD86811 0x5FED3BA1
 	static void _0x6D8EB211944DCE08(Any p0, BOOL p1) { invoke<Void>(0x6D8EB211944DCE08, p0, p1); } // 0x6D8EB211944DCE08 0x18C9DE8D
 	static void DRAW_SCALEFORM_MOVIE(Any x, Any y, float width, float height, float heading, int r, int g, int b, int alpha) { invoke<Void>(0x54972ADAF0294A93, x, y, width, height, heading, r, g, b, alpha); } // 0x54972ADAF0294A93 0x48DA6A58
-	static void _0x0DF606929C105BE1(Any scaleform, int p1, int p2, int p3, int p4) { invoke<Void>(0x0DF606929C105BE1, scaleform, p1, p2, p3, p4); } // 0x0DF606929C105BE1 0x7B48E696
+	static void DRAW_SCALEFORM_MOVIE_FULLSCREEN(int scaleform, int r, int g, int b, int a) { invoke<Void>(0x0DF606929C105BE1, scaleform, r, g, b, a); } // 0x0DF606929C105BE1 0x7B48E696
 	static void _0xCF537FDE4FBD4CE5(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0xCF537FDE4FBD4CE5, p0, p1, p2, p3, p4, p5); } // 0xCF537FDE4FBD4CE5 0x9C59FC06
 	static void _0x87D51D72255D4E78(Any p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, float p11, float p12, Any p13) { invoke<Void>(0x87D51D72255D4E78, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } // 0x87D51D72255D4E78 0xC4F63A89
 	static void _0x1CE592FDC749D6F5(Any p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, float p11, float p12, Any p13) { invoke<Void>(0x1CE592FDC749D6F5, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } // 0x1CE592FDC749D6F5 0x899933C8

@@ -86,7 +86,7 @@ void updateStuff()
 
 			if (featurePlayerNotifications || featureShowDeathCutscene)
 			{
-				Ped playerPed = PLAYER::GET_PLAYER_PED(playerId);
+				Ped playerPed = PLAYER::PLAYER_PED_ID();
 				if (ENTITY::DOES_ENTITY_EXIST(playerPed) && ENTITY::IS_ENTITY_DEAD(playerPed))
 				{
 					if (featurePlayerNotifications)
@@ -94,7 +94,7 @@ void updateStuff()
 						std::string msg = "You died.";
 						Entity e = PED::_GET_PED_KILLER(playerPed);
 						if (ENTITY::DOES_ENTITY_EXIST(e) && PED::IS_PED_A_PLAYER(e)) {
-							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _GET_PED_PLAYER
+							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _NETWORK_GET_PED_FROM_PLAYER
 							std::string kname = PLAYER::GET_PLAYER_NAME(killer);
 							if (kname != "") {
 								if (kname == PLAYER::GET_PLAYER_NAME(playerId))
@@ -125,8 +125,8 @@ void updateStuff()
 						WAIT(1000);
 
 						AUDIO::PLAY_SOUND_FRONTEND(-1, "TextHit", "WastedSounds", 1);
-						while (ENTITY::IS_ENTITY_DEAD(PLAYER::GET_PLAYER_PED(playerId))) {
-							GRAPHICS::_0x0DF606929C105BE1(scaleform, 255, 255, 255, 255);
+						while (ENTITY::IS_ENTITY_DEAD(PLAYER::PLAYER_PED_ID())) {
+							GRAPHICS::DRAW_SCALEFORM_MOVIE_FULLSCREEN(scaleform, 255, 255, 255, 255);
 							WAIT(0);
 						}
 						GRAPHICS::_STOP_SCREEN_EFFECT("DeathFailOut");
@@ -149,14 +149,14 @@ void updateStuff()
 				if (i != playerId)
 				{
 					Ped pedId = PLAYER::GET_PLAYER_PED(i);
-					unsigned int headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, (Any*)"", 0, 0, (Any*)"", 0); // CREATE_PED_HEAD_DISPLAY
+					unsigned int headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, "", 0, 0, "", 0); // _CREATE_PED_HEAD_DISPLAY
 
 					if (featurePlayerNotifications && ENTITY::DOES_ENTITY_EXIST(pedId) && ENTITY::IS_ENTITY_DEAD(pedId))
 					{
-						std::string msg = "<C>" + name + "</C> died.";;
+						std::string msg = "<C>" + name + "</C> died.";
 						Entity e = PED::_GET_PED_KILLER(pedId);
 						if (ENTITY::DOES_ENTITY_EXIST(e) && PED::IS_PED_A_PLAYER(e)) {
-							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _GET_PED_PLAYER
+							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _NETWORK_GET_PED_FROM_PLAYER
 							std::string kname = PLAYER::GET_PLAYER_NAME(killer);
 							if (kname != "") {
 								if (kname == name)
@@ -174,8 +174,8 @@ void updateStuff()
 					{
 						playerdb[i].head = headDisplayId;
 						if (featurePlayerHeadDisplay)
-							UI::_0xDEA2B8283BAA3944(headDisplayId, (Any*)name.c_str()); // SET_HEAD_DISPLAY_STRING
-						UI::_0x63BB75ABEDC1F6A0(headDisplayId, 0, 1); // SET_HEAD_DISPLAY_FLAG
+							UI::_0xDEA2B8283BAA3944(headDisplayId, (char*)name.c_str()); // _SET_HEAD_DISPLAY_STRING
+						UI::_0x63BB75ABEDC1F6A0(headDisplayId, 0, 1); // _SET_HEAD_DISPLAY_FLAG
 					}
 
 					if (playerWasDisconnected || !UI::DOES_BLIP_EXIST(playerdb[i].blip))
@@ -187,8 +187,7 @@ void updateStuff()
 							UI::SET_BLIP_SCALE(playerdb[i].blip, 0.8);
 							UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
 							UI::SET_BLIP_CATEGORY(playerdb[i].blip, 7);
-							UI::_0x5FBCA48327B914DF(playerdb[i].blip, 1);
-							
+							UI::_0x5FBCA48327B914DF(playerdb[i].blip, 1); // _SET_BLIP_SHOW_HEADING_INDICATOR
 						}
 
 						if (playerWasDisconnected || playerdb[i].name != name) // Making sure the player wasn't already here and only changed his ped (ex. skin change)
@@ -223,10 +222,10 @@ void updateStuff()
 						else if (vclass == 19)
 							sprite = 421; //Military
 
-						if (UI::GET_BLIP_SPRITE(playerdb[i].blip) != sprite)
+						if (UI::GET_BLIP_SPRITE(playerdb[i].blip) != sprite) {
 							UI::SET_BLIP_SPRITE(playerdb[i].blip, sprite);
-
-						UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i); // Blip name sometimes gets overriden by sprite name
+							UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i); // Blip name sometimes gets overriden by sprite name
+						}
 					}
 				}
 			}
@@ -239,7 +238,7 @@ void updateStuff()
 				}
 
 				if (UI::_0x4E929E7A5796FD26(playerdb[i].head))
-					UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
+					UI::_0xDEA2B8283BAA3944(playerdb[i].head, ""); // _SET_HEAD_DISPLAY_STRING
 				if (UI::DOES_BLIP_EXIST(playerdb[i].blip))
 					UI::REMOVE_BLIP(&playerdb[i].blip);
 
@@ -668,6 +667,12 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice)
 					show_notification("Really now?");
 				else
 				{
+					if (PED::GET_VEHICLE_PED_IS_IN(playerPed, 0) == ownedveh)
+					{
+						show_notification("Sorry, can't kick the driver out.");
+						break;
+					}
+
 					int lastSeat = VEHICLE::GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(ownedveh) - 1;
 					bool emptySeatFound = false;
 					for (int i = 0; i <= lastSeat; i++)
@@ -733,7 +738,7 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 					UI::SET_BLIP_SCALE(playerdb[i].blip, 0.8);
 					UI::SET_BLIP_NAME_TO_PLAYER_NAME(playerdb[i].blip, i);
 					UI::SET_BLIP_CATEGORY(playerdb[i].blip, 7);
-					UI::_0x5FBCA48327B914DF(playerdb[i].blip, 1);
+					UI::_0x5FBCA48327B914DF(playerdb[i].blip, 1); // _SET_BLIP_SHOW_HEADING_INDICATOR
 				}
 			}
 		}
@@ -751,13 +756,13 @@ bool onconfirm_settings_menu(MenuItem<int> choice)
 		{
 			for (int i = 0; i < MAX_PLAYERS; i++)
 				if (playerdb[i].name != "" && UI::_0x4E929E7A5796FD26(playerdb[i].head))
-					UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)playerdb[i].name.c_str());
+					UI::_0xDEA2B8283BAA3944(playerdb[i].head, (char*)playerdb[i].name.c_str()); // _SET_HEAD_DISPLAY_STRING
 		}
 		else
 		{
 			for (int i = 0; i < MAX_PLAYERS; i++)
 				if (playerdb[i].name != "" && UI::_0x4E929E7A5796FD26(playerdb[i].head))
-					UI::_0xDEA2B8283BAA3944(playerdb[i].head, (Any*)"");
+					UI::_0xDEA2B8283BAA3944(playerdb[i].head, ""); // _SET_HEAD_DISPLAY_STRING
 		}
 
 	}
@@ -786,7 +791,6 @@ bool onconfirm_main_menu(MenuItem<int> choice)
 		process_player_menu(onconfirm_playerteleport_menu, 1);
 		while (shouldRefreshPlayerMenu)
 			process_player_menu(onconfirm_playerteleport_menu, 0);
-		shouldRefreshPlayerMenu = true;
 		break;
 
 	case 1:
@@ -798,7 +802,6 @@ bool onconfirm_main_menu(MenuItem<int> choice)
 		break;
 
 	case 3:
-		show_notification("Options in this menu are not guaranteed to work and may cause crashes");
 		process_misc_menu();
 		break;
 
