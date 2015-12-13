@@ -87,14 +87,15 @@ void updateStuff()
 			if (featurePlayerNotifications || featureShowDeathCutscene)
 			{
 				Ped playerPed = PLAYER::PLAYER_PED_ID();
-				if (ENTITY::DOES_ENTITY_EXIST(playerPed) && ENTITY::IS_ENTITY_DEAD(playerPed))
+				if (ENTITY::IS_ENTITY_DEAD(playerPed) && ENTITY::DOES_ENTITY_EXIST(playerPed))
 				{
 					if (featurePlayerNotifications)
 					{
 						std::string msg = "You died.";
-						Entity e = PED::_GET_PED_KILLER(playerPed);
-						if (ENTITY::DOES_ENTITY_EXIST(e) && PED::IS_PED_A_PLAYER(e)) {
-							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _NETWORK_GET_PED_FROM_PLAYER
+						Hash weaponHash;
+						Entity e = NETWORK::NETWORK_GET_ENTITY_KILLER_OF_PLAYER(playerId, &weaponHash);
+						if (PED::IS_PED_A_PLAYER(e)) {
+							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _NETWORK_GET_PLAYER_FROM_PED
 							std::string kname = PLAYER::GET_PLAYER_NAME(killer);
 							if (kname != "") {
 								if (kname == PLAYER::GET_PLAYER_NAME(playerId))
@@ -151,12 +152,13 @@ void updateStuff()
 					Ped pedId = PLAYER::GET_PLAYER_PED(i);
 					unsigned int headDisplayId = UI::_0xBFEFE3321A3F5015(pedId, "", 0, 0, "", 0); // _CREATE_PED_HEAD_DISPLAY
 
-					if (featurePlayerNotifications && ENTITY::DOES_ENTITY_EXIST(pedId) && ENTITY::IS_ENTITY_DEAD(pedId))
+					if (featurePlayerNotifications && ENTITY::IS_ENTITY_DEAD(pedId) && ENTITY::DOES_ENTITY_EXIST(pedId))
 					{
 						std::string msg = "<C>" + name + "</C> died.";
-						Entity e = PED::_GET_PED_KILLER(pedId);
-						if (ENTITY::DOES_ENTITY_EXIST(e) && PED::IS_PED_A_PLAYER(e)) {
-							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _NETWORK_GET_PED_FROM_PLAYER
+						Hash weaponHash;
+						Entity e = NETWORK::NETWORK_GET_ENTITY_KILLER_OF_PLAYER(i, &weaponHash);
+						if (PED::IS_PED_A_PLAYER(e)) {
+							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _NETWORK_GET_PLAYER_FROM_PED
 							std::string kname = PLAYER::GET_PLAYER_NAME(killer);
 							if (kname != "") {
 								if (kname == name)
