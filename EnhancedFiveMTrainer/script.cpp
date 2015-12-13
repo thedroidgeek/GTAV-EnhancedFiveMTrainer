@@ -205,22 +205,23 @@ void updateStuff()
 					}
 
 					if (featurePlayerBlips) {
-						Vehicle v = PED::GET_VEHICLE_PED_IS_IN(playerdb[i].ped, false);
-						int vclass = VEHICLE::GET_VEHICLE_CLASS(v);
+
 						int sprite = 1;
 
-						if ((vclass >= 1 && vclass <= 12) || vclass == 17 || vclass == 18 || vclass == 20)
-							sprite = 225; //Car
-						else if (vclass == 8 || vclass == 13)
-							sprite = 226; //Bike
-						else if (vclass == 14)
-							sprite = 410; //Boat
-						else if (vclass == 15)
-							sprite = 422; //Helicopter
-						else if (vclass == 16)
-							sprite = 423; //Airplane
-						else if (vclass == 19)
-							sprite = 421; //Military
+						if (PED::IS_PED_IN_ANY_VEHICLE(playerdb[i].ped, 0))
+						{
+							Vehicle v = PED::GET_VEHICLE_PED_IS_IN(playerdb[i].ped, false);
+
+							switch (VEHICLE::GET_VEHICLE_CLASS(v)) {
+							case 8:
+							case 13: sprite = 226; //Bike
+							case 14: sprite = 410; //Boat
+							case 15: sprite = 422; //Helicopter
+							case 16: sprite = 423; //Airplane
+							case 19: sprite = 421; //Military
+							default: sprite = 225; //Car
+							}
+						}
 
 						if (UI::GET_BLIP_SPRITE(playerdb[i].blip) != sprite) {
 							UI::SET_BLIP_SPRITE(playerdb[i].blip, sprite);
