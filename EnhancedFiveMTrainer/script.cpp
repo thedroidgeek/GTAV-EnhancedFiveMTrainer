@@ -216,12 +216,12 @@ void updateStuff()
 
 							switch (VEHICLE::GET_VEHICLE_CLASS(v)) {
 							case 8:
-							case 13: sprite = 226; //Bike
-							case 14: sprite = 410; //Boat
-							case 15: sprite = 422; //Helicopter
-							case 16: sprite = 423; //Airplane
-							case 19: sprite = 421; //Military
-							default: sprite = 225; //Car
+							case 13: sprite = 226; break; //Bike
+							case 14: sprite = 410; break; //Boat
+							case 15: sprite = 422; break; //Helicopter
+							case 16: sprite = 423; break; //Airplane
+							case 19: sprite = 421; break; //Military
+							default: sprite = 225; break; //Car
 							}
 						}
 
