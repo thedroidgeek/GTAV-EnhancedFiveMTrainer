@@ -58,6 +58,89 @@ bool onconfirm_vehicle_menu(MenuItem<int> choice);
 bool onconfirm_exit_menu(MenuItem<int> choice);
 
 
+Hash $(char* string) { return GAMEPLAY::GET_HASH_KEY(string); }
+
+
+std::string killActionFromWeaponHash(Hash weaponHash)
+{
+	if (weaponHash != NULL)
+	{
+		if (weaponHash == $("WEAPON_RUN_OVER_BY_CAR") ||
+			weaponHash == $("WEAPON_RAMMED_BY_CAR"))
+			return "flattened";
+
+		if (weaponHash == $("WEAPON_CROWBAR") ||
+			weaponHash == $("WEAPON_BAT") ||
+			weaponHash == $("WEAPON_HAMMER") ||
+			weaponHash == $("WEAPON_GOLFCLUB") ||
+			weaponHash == $("WEAPON_NIGHTSTICK") ||
+			weaponHash == $("WEAPON_KNUCKLE"))
+			return "whacked";
+
+		if (weaponHash == $("WEAPON_DAGGER") ||
+			weaponHash == $("WEAPON_KNIFE"))
+			return "stabbed";
+
+		if (weaponHash == $("WEAPON_SNSPISTOL") ||
+			weaponHash == $("WEAPON_HEAVYPISTOL") ||
+			weaponHash == $("WEAPON_VINTAGEPISTOL") ||
+			weaponHash == $("WEAPON_PISTOL") ||
+			weaponHash == $("WEAPON_APPISTOL") ||
+			weaponHash == $("WEAPON_COMBATPISTOL") ||
+			weaponHash == $("WEAPON_SNSPISTOL"))
+			return "shot";
+
+		if (weaponHash == $("WEAPON_GRENADELAUNCHER") ||
+			weaponHash == $("WEAPON_HOMINGLAUNCHER") ||
+			weaponHash == $("WEAPON_STICKYBOMB") ||
+			weaponHash == $("WEAPON_PROXMINE") ||
+			weaponHash == $("WEAPON_RPG") ||
+			weaponHash == $("WEAPON_EXPLOSION") ||
+			weaponHash == $("VEHICLE_WEAPON_TANK"))
+			return "bombed";
+		
+		if (weaponHash == $("WEAPON_MICROSMG") ||
+			weaponHash == $("WEAPON_SMG") ||
+			weaponHash == $("WEAPON_ASSAULTSMG") ||
+			weaponHash == $("WEAPON_MG") ||
+			weaponHash == $("WEAPON_COMBATMG") ||
+			weaponHash == $("WEAPON_COMBATPDW") ||
+			weaponHash == $("WEAPON_MINIGUN"))
+			return "sprayed";
+
+		if (weaponHash == $("WEAPON_ASSAULTRIFLE") ||
+			weaponHash == $("WEAPON_CARBINERIFLE") ||
+			weaponHash == $("WEAPON_ADVANCEDRIFLE") ||
+			weaponHash == $("WEAPON_BULLPUPRIFLE") ||
+			weaponHash == $("WEAPON_SPECIALCARBINE") ||
+			weaponHash == $("WEAPON_GUSENBERG"))
+			return "rifled";
+
+		if (weaponHash == $("WEAPON_MARKSMANRIFLE") ||
+			weaponHash == $("WEAPON_SNIPERRIFLE") ||
+			weaponHash == $("WEAPON_HEAVYSNIPER") ||
+			weaponHash == $("WEAPON_ASSAULTSNIPER") ||
+			weaponHash == $("WEAPON_REMOTESNIPER"))
+			return "sniped";
+
+		if (weaponHash == $("WEAPON_BULLPUPSHOTGUN") ||
+			weaponHash == $("WEAPON_ASSAULTSHOTGUN") ||
+			weaponHash == $("WEAPON_PUMPSHOTGUN") ||
+			weaponHash == $("WEAPON_HEAVYSHOTGUN") ||
+			weaponHash == $("WEAPON_SAWNOFFSHOTGUN"))
+			return "shotgunned";
+
+		if (weaponHash == $("WEAPON_HATCHET") ||
+			weaponHash == $("WEAPON_MACHETTE"))
+			return "eviscerated";
+
+		if (weaponHash == $("WEAPON_MOLOTOV"))
+			return "torched";
+	}
+	return "murdered";
+}
+
+
 //=============================
 // FUNCTION THAT UPDATES STUFF
 //=============================
@@ -98,10 +181,12 @@ void updateStuff()
 							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _NETWORK_GET_PLAYER_FROM_PED
 							std::string kname = PLAYER::GET_PLAYER_NAME(killer);
 							if (kname != "") {
-								if (kname == PLAYER::GET_PLAYER_NAME(playerId))
+								if (kname == PLAYER::GET_PLAYER_NAME(playerId)) {
 									msg = "You commited suicide.";
-								else
-									msg = "<C>" + kname + "</C> murdered you.";
+								}
+								else {
+									msg = "<C>" + kname + "</C> " + killActionFromWeaponHash(weaponHash) + " you.";
+								}
 							}
 						}
 						show_notification((char*)msg.c_str());
@@ -161,12 +246,15 @@ void updateStuff()
 							Player killer = NETWORK::_0x6C0E2E0125610278(e); // _NETWORK_GET_PLAYER_FROM_PED
 							std::string kname = PLAYER::GET_PLAYER_NAME(killer);
 							if (kname != "") {
-								if (kname == name)
+								if (kname == name) {
 									msg = "<C>" + name + "</C> commited suicide.";
-								else if (kname == PLAYER::GET_PLAYER_NAME(playerId))
-									msg = "You killed <C>" + name + "</C>";
-								else
-									msg = "<C>" + kname + "</C> killed <C>" + name + "</C>";
+								}
+								else if (kname == PLAYER::GET_PLAYER_NAME(playerId)) {
+									msg = "You " + killActionFromWeaponHash(weaponHash) + " <C>" + name + "</C>";
+								}
+								else {
+									msg = "<C>" + kname + "</C> " + killActionFromWeaponHash(weaponHash) + " <C>" + name + "</C>";
+								}
 							}
 						}
 						show_notification((char*)msg.c_str());
