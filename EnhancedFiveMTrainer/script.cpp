@@ -131,7 +131,7 @@ std::string killActionFromWeaponHash(Hash weaponHash)
 			return "shotgunned";
 
 		if (weaponHash == $("WEAPON_HATCHET") ||
-			weaponHash == $("WEAPON_MACHETTE"))
+			weaponHash == $("WEAPON_MACHETE"))
 			return "eviscerated";
 
 		if (weaponHash == $("WEAPON_MOLOTOV"))
